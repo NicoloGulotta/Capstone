@@ -1,14 +1,15 @@
+// auth.js
 import jwt from 'jsonwebtoken';
 import User from '../models/user.model.js';
 import { config } from 'dotenv';
-import createError from 'http-errors'; // importa la funzione per creare errori
+import createError from 'http-errors';
 
 config(); // Carica le variabili d'ambiente
 
 // Funzione per generare un JWT
 export const generateJWT = (payload) =>
     new Promise((res, rej) => {
-        jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1 day' }, (err, token) => {
+        jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: '1 day' }, (err, token) => {
             if (err) rej(err);
             else res(token);
         });
@@ -17,7 +18,7 @@ export const generateJWT = (payload) =>
 // Funzione per verificare un JWT
 export const verifyJWT = (token) =>
     new Promise((res, rej) => {
-        jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
             if (err) rej(err);
             else res(decoded);
         });
@@ -26,27 +27,25 @@ export const verifyJWT = (token) =>
 // Middleware di autenticazione
 export const authMiddleware = async (req, res, next) => {
     try {
-        if (!req.headers.authorization) {
-            return next(createError(401, 'Effettua il login')); // Unauthorized (401)
+        const token = req.headers.authorization?.split(" ")[1]; // Estrai il token
+
+        if (!token) {
+            return next(createError(401, 'Token mancante'));
         }
 
-        const token = req.headers.authorization.replace('Bearer ', '');
-        const decoded = await verifyJWT(token);
-
-        if (decoded && decoded._id) {
-            const user = await User.findById(decoded._id)
-
-            if (user) {
-                req.user = user;
-                next();
-            } else {
-                return next(createError(404, 'Utente non trovato')); // Not Found (404)
-            }
-
-        } else {
-            return next(createError(401, 'Token non valido.')); // Unauthorized (401)
-        }
+        const decodedToken = await verifyJWT(token); // Usa await per gestire la promessa
+        req.user = decodedToken;
+        next();
     } catch (error) {
-        next(error); // Passa eventuali errori al prossimo middleware
+        console.error("Errore di autenticazione:", error);
+
+        // Verifica il tipo di errore JWT
+        if (error.name === 'JsonWebTokenError') {
+            return next(createError(401, 'Token non valido'));
+        } else if (error.name === 'TokenExpiredError') {
+            return next(createError(401, 'Token scaduto'));
+        } else {
+            return next(createError(500, 'Errore interno del server'));
+        }
     }
-};
+}

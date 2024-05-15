@@ -26,23 +26,30 @@ authRouter.post('/register', async (req, res, next) => {
 // Route POST /login: Effettua il login di un utente esistente
 authRouter.post('/login', async (req, res, next) => {
     try {
-        const userFound = await User.findOne({ email: req.body.email });
+        const userFound = await User.findOne({ email: req.body.email }).select('+password'); // Includi la password nella query
 
-        if (userFound) {
-            const isPasswordMatching = await bcrypt.compare(req.body.password, userFound.password);
-            if (isPasswordMatching) {
-                const token = await generateJWT({ _id: userFound._id });
-                res.send({ user: userFound, token });
-            } else {
-                next(createError(401, 'Invalid credentials')); // Credenziali non valide (401 Unauthorized)
-            }
+        if (!userFound) {
+            return next(createError(401, 'Invalid credentials'));
+        }
+
+        const isPasswordMatching = await bcrypt.compare(req.body.password, userFound.password);
+
+        if (isPasswordMatching) {
+            const token = await generateJWT({ _id: userFound._id });
+            res.send({ user: userFound, token });
         } else {
-            next(createError(401, 'Invalid credentials')); // Credenziali non valide (401 Unauthorized)
+            next(createError(401, 'Invalid credentials'));
         }
     } catch (error) {
-        next(error);
+        if (error.name === 'MongoServerError' && error.code === 13) {
+            return next(createError(401, 'Invalid credentials'));
+        } else {
+            console.error("Errore durante il login:", error);
+            next(error);
+        }
     }
 });
+
 
 // Route GET /profile: Ottiene il profilo dell'utente autenticato (richiede autenticazione)
 authRouter.get('/profile', authMiddleware, async (req, res, next) => {
