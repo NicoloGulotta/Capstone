@@ -1,11 +1,15 @@
-// blogCover.js
 import multer from 'multer';
 import { v2 as cloudinary } from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import { config } from 'dotenv';
-import createError from 'http-errors'; // importa la funzione per creare errori
+import createError from 'http-errors'; // 
 
 config();
+
+// Check if environment variables are loaded
+if (!process.env.CLOUD_NAME || !process.env.CLOUD_API_KEY || !process.env.CLOUD_API_SECRET) {
+    throw new Error("Missing Cloudinary configuration variables");
+}
 
 cloudinary.config({
     cloud_name: process.env.CLOUD_NAME,
@@ -16,19 +20,22 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
     cloudinary,
     params: {
-        folder: 'covers',
-        allowedFormats: ['jpg', 'png', 'jpeg'] // Specifica i formati consentiti (opzionale)
+        folder: 'cover',
+        allowedFormats: ['jpg', 'png', 'jpeg'],
     },
 });
 
-const blogCover = multer({
+const postCover = multer({
     storage,
     fileFilter: (req, file, cb) => {
+        if (!file) {
+            return cb(createError(400, 'No file selected'));
+        }
         if (!file.mimetype.startsWith('image/')) {
-            return cb(createError(400, "Il file deve essere un'immagine."));
+            return cb(createError(400, `Invalid file type: ${file.mimetype}. Only images are allowed.`));
         }
         cb(null, true);
     }
 }).single('cover');
 
-export default blogCover;
+export default postCover;

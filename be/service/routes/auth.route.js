@@ -2,47 +2,47 @@ import { Router } from "express";
 import bcrypt from "bcryptjs";
 import User from '../models/user.model.js';
 import { authMiddleware, generateJWT } from "../auth/auth.js";
-import createError from 'http-errors'; // Per creare errori personalizzati
+import createError from 'http-errors';
 import passport from "../auth/passport.js";
 
 const authRouter = Router();
 
-// Route GET /: Restituisce una semplice pagina di login (puoi personalizzarla)
-authRouter.get('/', (req, res) => {
-    res.send('Login Page');
+// GET /auth/login: Restituisce una semplice pagina di login 
+authRouter.get('/login', (req, res) => {
+    res.send('Pagina di Login'); // Sostituisci con il tuo HTML di login
 });
 
-// Route POST /register: Registra un nuovo utente
+// POST /auth/register: Registra un nuovo utente
 authRouter.post('/register', async (req, res, next) => {
     try {
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
-        let user = await User.create({ ...req.body, password: hashedPassword });
+        const user = await User.create({ ...req.body, password: hashedPassword });
         res.send(user);
     } catch (error) {
-        next(error); // Passa l'errore al middleware di gestione degli errori
+        next(error);
     }
 });
 
-// Route POST /login: Effettua il login di un utente esistente
+// POST /auth/login: Effettua il login di un utente esistente
 authRouter.post('/login', async (req, res, next) => {
     try {
-        const userFound = await User.findOne({ email: req.body.email }).select('+password'); // Includi la password nella query
+        const user = await User.findOne({ email: req.body.email }).select('+password');
 
-        if (!userFound) {
-            return next(createError(401, 'Invalid credentials'));
+        if (!user) {
+            return next(createError(401, 'Credenziali non valide'));
         }
 
-        const isPasswordMatching = await bcrypt.compare(req.body.password, userFound.password);
+        const isPasswordMatching = await bcrypt.compare(req.body.password, user.password);
 
         if (isPasswordMatching) {
-            const token = await generateJWT({ _id: userFound._id });
-            res.send({ user: userFound, token });
+            const token = await generateJWT({ _id: user._id });
+            res.send({ user, token });
         } else {
-            next(createError(401, 'Invalid credentials'));
+            next(createError(401, 'Credenziali non valide'));
         }
     } catch (error) {
         if (error.name === 'MongoServerError' && error.code === 13) {
-            return next(createError(401, 'Invalid credentials'));
+            return next(createError(401, 'Credenziali non valide'));
         } else {
             console.error("Errore durante il login:", error);
             next(error);
@@ -50,25 +50,23 @@ authRouter.post('/login', async (req, res, next) => {
     }
 });
 
-
-// Route GET /profile: Ottiene il profilo dell'utente autenticato (richiede autenticazione)
+// GET /auth/profile: Ottiene il profilo dell'utente autenticato (richiede autenticazione)
 authRouter.get('/profile', authMiddleware, async (req, res, next) => {
     try {
-        let user = await User.findById(req.user._id);
+        const user = await User.findById(req.user._id);
         res.send(user);
     } catch (error) {
         next(error);
     }
 });
 
-// Route GET /me: Verifica se l'utente è un amministratore (richiede autenticazione)
-authRouter.get('/check-admin', authMiddleware, async (req, res, next) => { // Nome più descrittivo
+// GET /auth/check-admin: Verifica se l'utente è un amministratore (richiede autenticazione)
+authRouter.get('/check-admin', authMiddleware, async (req, res, next) => {
     try {
-        // Assumi che il tuo modello User abbia un campo 'isAdmin'
         if (req.user.isAdmin) {
-            res.send(req.user); // Invia i dettagli dell'utente se è un amministratore
+            res.send(req.user);
         } else {
-            next(createError(403, 'Forbidden')); // Non autorizzato (403 Forbidden)
+            next(createError(403, 'Vietato'));
         }
     } catch (error) {
         next(error);

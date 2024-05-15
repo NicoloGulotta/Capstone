@@ -3,20 +3,25 @@ import { Schema, model } from "mongoose";
 const postSchema = new Schema(
     {
         title: {
-            type: 'string',
+            type: String,    // Use 'String' instead of 'string' (Mongoose convention)
             required: true
         },
         cover: {
             type: String,
-            required: true
+            default: 'https://via.placeholder.com/800x600' // Placeholder URL
         },
         content: {
             type: String,
             required: true
         },
-        comment: [{
+        author: {           // Add author field as a reference to the User model
             type: Schema.Types.ObjectId,
-            ref: "comment"
+            ref: 'User',
+            required: true
+        },
+        comments: [{
+            type: Schema.Types.ObjectId,
+            ref: 'Comment'
         }]
     },
     {
@@ -24,4 +29,5 @@ const postSchema = new Schema(
         timestamps: true
     }
 );
+
 export default model("Post", postSchema);
