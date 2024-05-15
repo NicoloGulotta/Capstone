@@ -26,6 +26,8 @@ export const verifyJWT = (token) =>
 
 // Middleware di autenticazione
 export const authMiddleware = async (req, res, next) => {
+    console.log("Headers:", req.headers); // Verifica gli header della richiesta
+    console.log("Auth:", req.headers.authorization);
     try {
         const token = req.headers.authorization?.split(" ")[1]; // Estrai il token
 
