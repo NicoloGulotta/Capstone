@@ -8,13 +8,13 @@ const postSchema = new Schema(
         },
         cover: {
             type: String,
-            default: 'https://via.placeholder.com/800x600' // Placeholder URL
+            default: 'https://via.placeholder.com/800x600'
         },
         content: {
             type: String,
             required: true
         },
-        author: {           // Add author field as a reference to the User model
+        author: {
             type: Schema.Types.ObjectId,
             ref: 'User',
             required: true

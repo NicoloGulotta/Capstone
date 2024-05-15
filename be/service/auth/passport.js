@@ -10,7 +10,7 @@ const options = {
     passReqToCallback: true
 };
 
-const googleStrategy = new GoogleStrategy(options, async (req, accessToken, refreshToken, profile, passportNext) => {
+const googleStrategy = new GoogleStrategy(options, async (req, accessToken, refreshToken, profile, done) => {
     try {
         const { email, family_name, given_name, sub, picture } = profile._json;
 
@@ -18,30 +18,39 @@ const googleStrategy = new GoogleStrategy(options, async (req, accessToken, refr
         let user = await User.findOne({ email });
 
         if (user) {
-            // Aggiorna i dati dell'utente se necessario (ad es., avatar)
-            if (user.avatar !== picture) {
-                user.avatar = picture;
-                await user.save();
-            }
-
-            const accToken = await generateJWT({ _id: user._id });
-            passportNext(null, { ...user, accToken });
+            // Aggiorna i dati dell'utente se necessario
+            user.avatar = picture;
+            user.name = given_name;  // Aggiorna anche il nome
+            user.surname = family_name; // Aggiorna anche il cognome
+            await user.save();
         } else {
             // Crea un nuovo utente
-            const newUser = await User.create({
+            user = await User.create({
                 email,
                 name: given_name,
                 surname: family_name,
-                password: '', // Puoi generare una password casuale se necessario
+                password: '', // O genera una password casuale sicura
                 avatar: picture,
-                googleId: sub
+                googleId: sub,
+                role: 'user' // Imposta il ruolo di default (se applicabile)
             });
-
-            const accToken = await generateJWT({ _id: newUser._id });
-            passportNext(null, { ...newUser, accToken }); // Include l'accessToken
         }
+
+        const token = await generateJWT({ _id: user._id });
+
+        // Personalizza l'oggetto utente restituito (rimuovi dati sensibili se necessario)
+        const userToReturn = {
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            avatar: user.avatar,
+            // ... altri campi che da includere ...
+        };
+
+        done(null, { ...userToReturn, token });
     } catch (error) {
-        passportNext(createError(500, 'Errore durante l\'autenticazione Google'));
+        console.error("Errore durante l'autenticazione Google:", error);
+        done(error); // Passa l'errore a Passport per la gestione
     }
 });
 

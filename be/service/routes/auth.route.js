@@ -26,27 +26,45 @@ authRouter.post('/register', async (req, res, next) => {
 // POST /auth/login: Effettua il login di un utente esistente
 authRouter.post('/login', async (req, res, next) => {
     try {
-        const user = await User.findOne({ email: req.body.email }).select('+password');
+        const { email, password } = req.body;
+
+        // Verifica la presenza delle credenziali
+        if (!email || !password) {
+            return next(createError(400, "Email e password sono obbligatori"));
+        }
+
+        const user = await User.findOne({ email }).select('+password');
 
         if (!user) {
             return next(createError(401, 'Credenziali non valide'));
         }
 
-        const isPasswordMatching = await bcrypt.compare(req.body.password, user.password);
+        const isPasswordMatching = await bcrypt.compare(password, user.password);
 
         if (isPasswordMatching) {
             const token = await generateJWT({ _id: user._id });
-            res.send({ user, token });
+
+            // Popola gli appuntamenti e i commenti di ogni appuntamento
+            const userWithAppointmentsAndComments = await User.findById(user._id)
+                .populate({
+                    path: 'appointments',
+                    populate: {
+                        path: 'comments',
+                        model: 'Comment'
+                    }
+                });
+
+            // Rimuovi il campo password dalla risposta
+            const userWithoutPassword = userWithAppointmentsAndComments.toObject();
+            delete userWithoutPassword.password;
+
+            res.send({ user: userWithoutPassword, token });
         } else {
             next(createError(401, 'Credenziali non valide'));
         }
     } catch (error) {
-        if (error.name === 'MongoServerError' && error.code === 13) {
-            return next(createError(401, 'Credenziali non valide'));
-        } else {
-            console.error("Errore durante il login:", error);
-            next(error);
-        }
+        console.error("Errore durante il login:", error);
+        next(error);
     }
 });
 
@@ -72,16 +90,29 @@ authRouter.get('/check-admin', authMiddleware, async (req, res, next) => {
         next(error);
     }
 });
-// authRouter.get('/googleLogin', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-// authRouter.get('/callback', passport.authenticate('google', { session: false }), (req, res, next) => {
+authRouter.get('/google', (req, res, next) => {
+    // Aggiungi un controllo per verificare se req.query esiste
+    if (req && req.query) {
+        passport.authenticate('google', { scope: ['profile', 'email'], loginHint: req.query.login_hint })(req, res, next);
+    } else {
+        // Gestisci il caso in cui req.query è undefined (ad esempio, reindirizza a una pagina di errore)
+        next(createError(500, 'Errore interno del server'));
+    }
+});
 
-//     try {
-//         res.redirect('https://' + req.user.accToken);
-//     } catch (error) {
-//         next(error);
-//     }
+authRouter.get(
+    '/google/callback',
+    passport.authenticate('google', { session: false }),
+    async (req, res, next) => {
+        try {
+            const token = await generateJWT({ _id: req.user._id });
+            const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+            res.redirect(`${frontendUrl}/?token=${token}`);
+        } catch (error) {
+            next(error);
+        }
+    }
+);
 
-
-// });
 export default authRouter;

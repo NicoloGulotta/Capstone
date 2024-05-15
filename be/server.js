@@ -15,6 +15,7 @@ import {
 import testRouter from './service/routes/test.route.js';
 import authRouter from './service/routes/auth.route.js';
 import postRouter from './service/routes/post.route.js';
+import AppointmentRouter from './service/routes/appointmentRouter.js';
 import { authMiddleware } from './service/auth/auth.js';
 
 const app = express();
@@ -28,6 +29,7 @@ config();
 app.use("/test", testRouter);
 app.use("/auth", authRouter);
 app.use("/post", authMiddleware, postRouter);
+app.use("/appointment", authMiddleware, AppointmentRouter)
 
 // Error Handlers 
 app.use(badRequestHandler);

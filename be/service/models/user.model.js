@@ -51,10 +51,22 @@ const userSchema = new Schema(
             enum: ["user", "moderator", "admin"],
             default: "user",
         },
+        appointments: [{ // Nuovo campo per memorizzare gli appuntamenti
+            type: Schema.Types.ObjectId,
+            ref: 'Appointment'
+        }]
     },
     {
         collection: "users",
         timestamps: true,
     }
 );
+
+// // Middleware pre-save per hashare la password
+// userSchema.pre('save', async function (next) {
+//     if (!this.isModified('password')) return next(); // Se la password non è stata modificata, salta l'hashing
+//     this.password = await bcrypt.hash(this.password, 10);
+//     next();
+// });
+
 export default model("User", userSchema);
