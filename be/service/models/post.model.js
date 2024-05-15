@@ -20,7 +20,7 @@ const postSchema = new Schema(
         }]
     },
     {
-        coollection: "Post",
+        collection: "Post",
         timestamps: true
     }
 );
