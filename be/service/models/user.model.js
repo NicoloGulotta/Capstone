@@ -37,8 +37,12 @@ const userSchema = new Schema(
         },
         password: {
             type: String,
-            required: true,
+            required: false,
             select: false, // Non includere la password nelle query di default
+        },
+        googleId: {
+            type: String,
+            required: false,
         },
         comments: [
             {
@@ -51,7 +55,7 @@ const userSchema = new Schema(
             enum: ["user", "moderator", "admin"],
             default: "user",
         },
-        appointments: [{ // Nuovo campo per memorizzare gli appuntamenti
+        appointments: [{
             type: Schema.Types.ObjectId,
             ref: 'Appointment'
         }]

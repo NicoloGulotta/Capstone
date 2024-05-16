@@ -1,55 +1,48 @@
-import GoogleStrategy from 'passport-google-oauth2';
-import { generateJWT } from './auth.js';
-import User from '../models/user.model.js';
-import { config } from 'dotenv';
-config();
+import GoogleStrategy from 'passport-google-oauth20'
+import "dotenv/config";
+import User from '../models/user.model';
+import { generateJWT } from './auth';
+
 const options = {
-    clientID: process.env.G_ID,
-    clientSecret: process.env.G_SECRET,
-    callbackURL: process.env.G_CALLBACK_URL,
-    passReqToCallback: true
+    // client id preso dalla console di google alla registrazione dell'applicazione
+    clientID: process.env.G_CLIENT_ID,
+    // client secret preso dalla console di google alla registrazione dell'applicazione
+    clientSecret: process.env.G_CLIENT_SECRET,
+    // callback da eseguire quando un utete effettua a'autentitacione all endpoint
+    callBackURL: process.env.G_CALLBACK_URL
 }
-
-
-const googleStrategy = new GoogleStrategy(options, async (req, accessToken, refreshToken, profile, passportNext) => {
+// creo istanza GoogleStrategy
+const googleStrategy = new GoogleStrategy(options, async (_accessToken, _refreshToken, profile, passportNext) => {
+    // definiamo una funzione callback che viene chiamata in fase di autenticazione
     try {
-        const { email, family_name, given_name, sub, picture } = profile._json;
-        console.log(profile._json);
+        //Destrutturiamo l'ogetto profile e predniamo i dati che ci servono
+        const { email, given_name, family_name, sub, picture } = profile._json;
 
-        // Verifica se l'utente esiste già nel database
-        const admin = await User.findOne({ email });
-
-        if (admin) {
-            // L'utente esiste quindi creiamo un Token
-            const accToken = await generateJWT({
-                _id: admin._id
-            })
-
-            // Passiamo al prossimo middleware se tutto ok
-            //  il primo argomento è un errore 
-            // ... dentro googleStrategy
-            passportNext(null, admin || newAdmin);
+        // verifica se l'utente esiste già nel database
+        const user = await User.findOne({ email });
+        // L'utente esiste già nel database?
+        if (user) {
+            //se esiste creiamo il token di accesso tramite servizio di googleStrategy
+            const accToken = await createAccessToken({
+                _id: user._id
+            });
+            passportNext(null, { accToken })
         } else {
-            // L'utente non esiste quindi creiamo un nuovo utente
-            const newAdmin = await User.create({
-                email: email,
-                nome: given_name,
-                cognome: family_name,
-                password: '',
-                avatar: picture,
-                googleId: sub
+            // se l'utente non esiste nel database creiamo un nuovo utente
+            const newUser = new User({
+                username: email,
+                googleId: sub,
             });
-
+            //salva utente nel database
+            await newUser.save();
+            // generiamo token
             const accToken = await generateJWT({
-                id: newAdmin._id
+                username: newUser.username
             });
-
-            passportNext(null, { accToken });
+            passportNext(null, { accToken })
         }
-
     } catch (error) {
-        passportNext(error);
+        passportNext(error)
     }
 });
-
 export default googleStrategy;

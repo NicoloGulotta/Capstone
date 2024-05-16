@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import User from '../models/user.model.js';
 import { authMiddleware, generateJWT } from "../auth/auth.js";
 import createError from 'http-errors';
-import passport from "../auth/passport.js";
+import passport from "passport";
 
 const authRouter = Router();
 
@@ -91,22 +91,19 @@ authRouter.get('/check-admin', authMiddleware, async (req, res, next) => {
     }
 });
 
-authRouter.get('/googleLogin', passport.authenticate('google', { scope: ['profile', 'email'] }));
+authRouter.get('/googlelogin',
+    passport.authenticate("google", { scope: ["profile", "email"] })
+);
 
-authRouter.get('/google/callback',
-    passport.authenticate('google', { session: false, failureRedirect: '/login-failure' }), // Reindirizza in caso di errore
-    async (req, res, next) => {
-        if (!req.user) { // Controlla se l'utente è autenticato
-            return next(new Error("Autenticazione fallita")); // Passa l'errore al gestore successivo
-        }
+authRouter.get('/callback',
+    passport.authenticate("google", { session: false }), (req, res, next) => {
         try {
-            const token = await generateJWT({ _id: req.user._id });
-            const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-            res.redirect(`${frontendUrl}/?token=${token}`);
+            res.redirect(`http://localhost:3000/profile?accessToken=${req.user.accessToken}`);
         } catch (error) {
             next(error);
         }
-    }
-);
+    });
+
+
 
 export default authRouter;
