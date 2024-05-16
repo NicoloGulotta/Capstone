@@ -1,56 +1,54 @@
 import GoogleStrategy from 'passport-google-oauth2';
 import { generateJWT } from './auth.js';
 import User from '../models/user.model.js';
-import createError from "http-errors";
-
+import { config } from 'dotenv';
+config();
 const options = {
     clientID: process.env.G_ID,
     clientSecret: process.env.G_SECRET,
     callbackURL: process.env.G_CALLBACK_URL,
     passReqToCallback: true
-};
+}
 
-const googleStrategy = new GoogleStrategy(options, async (req, accessToken, refreshToken, profile, done) => {
+
+const googleStrategy = new GoogleStrategy(options, async (req, accessToken, refreshToken, profile, passportNext) => {
     try {
         const { email, family_name, given_name, sub, picture } = profile._json;
+        console.log(profile._json);
 
-        // Verifica se l'utente esiste già
-        let user = await User.findOne({ email });
+        // Verifica se l'utente esiste già nel database
+        const admin = await User.findOne({ email });
 
-        if (user) {
-            // Aggiorna i dati dell'utente se necessario
-            user.avatar = picture;
-            user.name = given_name;  // Aggiorna anche il nome
-            user.surname = family_name; // Aggiorna anche il cognome
-            await user.save();
+        if (admin) {
+            // L'utente esiste quindi creiamo un Token
+            const accToken = await generateJWT({
+                _id: admin._id
+            })
+
+            // Passiamo al prossimo middleware se tutto ok
+            //  il primo argomento è un errore 
+            // ... dentro googleStrategy
+            passportNext(null, admin || newAdmin);
         } else {
-            // Crea un nuovo utente
-            user = await User.create({
-                email,
-                name: given_name,
-                surname: family_name,
-                password: '', // O genera una password casuale sicura
+            // L'utente non esiste quindi creiamo un nuovo utente
+            const newAdmin = await User.create({
+                email: email,
+                nome: given_name,
+                cognome: family_name,
+                password: '',
                 avatar: picture,
-                googleId: sub,
-                role: 'user' // Imposta il ruolo di default (se applicabile)
+                googleId: sub
             });
+
+            const accToken = await generateJWT({
+                id: newAdmin._id
+            });
+
+            passportNext(null, { accToken });
         }
 
-        const token = await generateJWT({ _id: user._id });
-
-        // Personalizza l'oggetto utente restituito (rimuovi dati sensibili se necessario)
-        const userToReturn = {
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            avatar: user.avatar,
-            // ... altri campi che da includere ...
-        };
-
-        done(null, { ...userToReturn, token });
     } catch (error) {
-        console.error("Errore durante l'autenticazione Google:", error);
-        done(error); // Passa l'errore a Passport per la gestione
+        passportNext(error);
     }
 });
 

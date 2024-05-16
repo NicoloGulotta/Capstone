@@ -9,7 +9,7 @@ const authRouter = Router();
 
 // GET /auth/login: Restituisce una semplice pagina di login 
 authRouter.get('/login', (req, res) => {
-    res.send('Pagina di Login'); // Sostituisci con il tuo HTML di login
+    res.send('Pagina di Login');
 });
 
 // POST /auth/register: Registra un nuovo utente
@@ -91,20 +91,14 @@ authRouter.get('/check-admin', authMiddleware, async (req, res, next) => {
     }
 });
 
-authRouter.get('/google', (req, res, next) => {
-    // Aggiungi un controllo per verificare se req.query esiste
-    if (req && req.query) {
-        passport.authenticate('google', { scope: ['profile', 'email'], loginHint: req.query.login_hint })(req, res, next);
-    } else {
-        // Gestisci il caso in cui req.query è undefined (ad esempio, reindirizza a una pagina di errore)
-        next(createError(500, 'Errore interno del server'));
-    }
-});
+authRouter.get('/googleLogin', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-authRouter.get(
-    '/google/callback',
-    passport.authenticate('google', { session: false }),
+authRouter.get('/google/callback',
+    passport.authenticate('google', { session: false, failureRedirect: '/login-failure' }), // Reindirizza in caso di errore
     async (req, res, next) => {
+        if (!req.user) { // Controlla se l'utente è autenticato
+            return next(new Error("Autenticazione fallita")); // Passa l'errore al gestore successivo
+        }
         try {
             const token = await generateJWT({ _id: req.user._id });
             const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
