@@ -92,18 +92,23 @@ authRouter.get('/check-admin', authMiddleware, async (req, res, next) => {
 });
 
 authRouter.get('/googlelogin',
-    passport.authenticate("google", { scope: ["profile", "email"] })
+    passport.authenticate("google", {
+        scope: ["profile", "email"],
+        callbackURL: process.env.G_CALLBACK_URL
+    })
 );
 
 authRouter.get('/callback',
     passport.authenticate("google", { session: false }), (req, res, next) => {
         try {
-            res.redirect(`http://localhost:3000/profile?accessToken=${req.user.accessToken}`);
+            console.log(res.redirect);
+            res.redirect(`${process.env.FRONTEND_URL}/auth/profile?accessToken=${req.user.accessToken}`);
         } catch (error) {
             next(error);
         }
     });
-
+console.log(process.env.FRONTEND_URL);
+console.log(process.env.G_CALLBACK_URL)
 
 
 export default authRouter;

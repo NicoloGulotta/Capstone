@@ -4,7 +4,7 @@ const appointmentSchema = new mongoose.Schema({
     serviceType: {
         type: String,
         required: true,
-        enum: ['Consulenza', 'Taglio capelli', 'Manicure', 'Altro'] // Personalizza con i tuoi servizi
+        enum: ['Consulenza', 'Taglio capelli', 'Manicure', 'Altro']
     },
     date: {
         type: Date,

@@ -1,7 +1,7 @@
 import GoogleStrategy from 'passport-google-oauth20'
 import "dotenv/config";
-import User from '../models/user.model';
-import { generateJWT } from './auth';
+import User from '../models/user.model.js';
+import { generateJWT } from './auth.js';
 
 const options = {
     // client id preso dalla console di google alla registrazione dell'applicazione
@@ -11,6 +11,8 @@ const options = {
     // callback da eseguire quando un utete effettua a'autentitacione all endpoint
     callBackURL: process.env.G_CALLBACK_URL
 }
+console.log(options);
+
 // creo istanza GoogleStrategy
 const googleStrategy = new GoogleStrategy(options, async (_accessToken, _refreshToken, profile, passportNext) => {
     // definiamo una funzione callback che viene chiamata in fase di autenticazione
