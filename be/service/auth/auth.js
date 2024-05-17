@@ -37,6 +37,8 @@ export const authMiddleware = async (req, res, next) => {
 
         const decodedToken = await verifyJWT(token); // Usa await per gestire la promessa
         req.user = decodedToken;
+        console.log(token);
+        console.log(decodedToken);
         next();
     } catch (error) {
         console.error("Errore di autenticazione:", error);

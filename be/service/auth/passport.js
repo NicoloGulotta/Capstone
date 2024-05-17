@@ -9,7 +9,7 @@ const options = {
     // client secret preso dalla console di google alla registrazione dell'applicazione
     clientSecret: process.env.G_CLIENT_SECRET,
     // callback da eseguire quando un utete effettua a'autentitacione all endpoint
-    callBackURL: process.env.G_CALLBACK_URL
+    callbackURL: process.env.G_CALLBACK_URL
 }
 console.log(options);
 
@@ -25,7 +25,7 @@ const googleStrategy = new GoogleStrategy(options, async (_accessToken, _refresh
         // L'utente esiste già nel database?
         if (user) {
             //se esiste creiamo il token di accesso tramite servizio di googleStrategy
-            const accToken = await createAccessToken({
+            const accToken = await generateJWT({
                 _id: user._id
             });
             passportNext(null, { accToken })
@@ -34,17 +34,22 @@ const googleStrategy = new GoogleStrategy(options, async (_accessToken, _refresh
             const newUser = new User({
                 username: email,
                 googleId: sub,
+                name: given_name,
+                surname: family_name,
+                avatar: picture,
+                email: email,
             });
             //salva utente nel database
             await newUser.save();
             // generiamo token
-            const accToken = await generateJWT({
-                username: newUser.username
+            const accessToken = await generateJWT({
+                _id: newUser._id
             });
-            passportNext(null, { accToken })
+            passportNext(null, { accessToken })
         }
     } catch (error) {
         passportNext(error)
+        console.log("hello");
     }
 });
 export default googleStrategy;

@@ -29,7 +29,7 @@ const userSchema = new Schema(
         },
         dataDiNascita: {
             type: Date,
-            required: true,
+            required: false,
         },
         avatar: {
             type: String,

@@ -38,7 +38,9 @@ function Profile() {
             <h1>Profilo Utente</h1>
             {userData ? (
                 <div>
+                    {userData.avatar && <img src={userData.avatar} alt="Avatar" />}
                     <p>Nome: {userData.name}</p>
+                    <p>Cognome: {userData.surname}</p>
                     <p>Email: {userData.email}</p>
                 </div>
             ) : (

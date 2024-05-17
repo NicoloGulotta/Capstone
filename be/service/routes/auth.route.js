@@ -73,6 +73,7 @@ authRouter.get('/profile', authMiddleware, async (req, res, next) => {
     try {
         const user = await User.findById(req.user._id);
         res.send(user);
+        console.log(user);
     } catch (error) {
         next(error);
     }
@@ -100,6 +101,7 @@ authRouter.get('/googlelogin',
 authRouter.get('/callback',
     passport.authenticate("google", { session: false }), (req, res, next) => {
         try {
+            console.log(req);
             res.redirect(`${process.env.FRONTEND_URL}?accessToken=${req.user.accessToken}`);
         } catch (error) {
             next(error);
