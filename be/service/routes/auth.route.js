@@ -97,18 +97,13 @@ authRouter.get('/googlelogin',
         callbackURL: process.env.G_CALLBACK_URL
     })
 );
-
 authRouter.get('/callback',
     passport.authenticate("google", { session: false }), (req, res, next) => {
         try {
-            console.log(res.redirect);
             res.redirect(`${process.env.FRONTEND_URL}/auth/profile?accessToken=${req.user.accessToken}`);
         } catch (error) {
             next(error);
         }
     });
 console.log(process.env.FRONTEND_URL);
-console.log(process.env.G_CALLBACK_URL)
-
-
 export default authRouter;

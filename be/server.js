@@ -20,7 +20,7 @@ import {
 import testRouter from './service/routes/test.route.js';
 import authRouter from './service/routes/auth.route.js';
 import postRouter from './service/routes/post.route.js';
-import AppointmentRouter from './service/routes/appointmentRouter.js';
+import appointmentRouter from './service/routes/appointment.router.js';
 
 // Importazione del middleware di autenticazione 
 import { authMiddleware } from './service/auth/auth.js';
@@ -41,7 +41,7 @@ passport.use("google", googleStrategy);
 app.use("/test", testRouter);        // Route di test (senza autenticazione)
 app.use("/auth", authRouter);       // Route di autenticazione
 app.use("/post", authMiddleware, postRouter);  // Route per i post (richiede autenticazione)
-app.use("/appointment", authMiddleware, AppointmentRouter); // Route per gli appuntamenti (richiede autenticazione)
+app.use("/appointment", authMiddleware, appointmentRouter); // Route per gli appuntamenti (richiede autenticazione)
 
 // Gestione degli errori centralizzata
 app.use(badRequestHandler);     // 400 Bad Request
