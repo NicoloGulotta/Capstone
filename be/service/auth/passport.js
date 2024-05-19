@@ -1,37 +1,33 @@
-import GoogleStrategy from 'passport-google-oauth20'
+import GoogleStrategy from 'passport-google-oauth20';
 import "dotenv/config";
 import User from '../models/user.model.js';
 import { generateJWT } from './auth.js';
 
 const options = {
-    // client id preso dalla console di google alla registrazione dell'applicazione
     clientID: process.env.G_CLIENT_ID,
-    // client secret preso dalla console di google alla registrazione dell'applicazione
     clientSecret: process.env.G_CLIENT_SECRET,
-    // callback da eseguire quando un utete effettua a'autentitacione all endpoint
     callbackURL: process.env.G_CALLBACK_URL
-}
-console.log(options);
+};
 
-// creo istanza GoogleStrategy
-const googleStrategy = new GoogleStrategy(options, async (_accessToken, _refreshToken, profile, passportNext) => {
-    // definiamo una funzione callback che viene chiamata in fase di autenticazione
+//console.log(options);
+
+const googleStrategy = new GoogleStrategy(options, async (_accessToken, _refreshToken, profile, done) => {
     try {
-        //Destrutturiamo l'ogetto profile e predniamo i dati che ci servono
         const { email, given_name, family_name, sub, picture } = profile._json;
 
-        // verifica se l'utente esiste già nel database
-        const user = await User.findOne({ email });
-        // L'utente esiste già nel database?
+
+        // Cerca l'utente nel database per email o Google ID (corretto)
+        let user = await User.findOne({ $or: [{ email }, { googleId: sub }] });
+
         if (user) {
-            //se esiste creiamo il token di accesso tramite servizio di googleStrategy
-            const accToken = await generateJWT({
-                _id: user._id
-            });
-            passportNext(null, { accToken })
+            // Aggiorna i dati dell'utente esistente (se necessario)
+            user.name = given_name;
+            user.surname = family_name;
+            user.avatar = picture;
+            await user.save();
         } else {
-            // se l'utente non esiste nel database creiamo un nuovo utente
-            const newUser = new User({
+            // Crea un nuovo utente
+            user = new User({
                 username: email,
                 googleId: sub,
                 name: given_name,
@@ -39,17 +35,18 @@ const googleStrategy = new GoogleStrategy(options, async (_accessToken, _refresh
                 avatar: picture,
                 email: email,
             });
-            //salva utente nel database
-            await newUser.save();
-            // generiamo token
-            const accessToken = await generateJWT({
-                _id: newUser._id
-            });
-            passportNext(null, { accessToken })
+            await user.save();
         }
+
+        // Genera un token JWT per l'utente autenticato
+        const accessToken = await generateJWT({ _id: user._id });
+
+        // Passa l'utente e il token a 'done' (corretto)
+        done(null, { user, accessToken });
     } catch (error) {
-        passportNext(error)
-        console.log("hello");
+        done(error);
+        console.error("Errore durante l'autenticazione:", error);
     }
 });
+
 export default googleStrategy;
