@@ -22,7 +22,7 @@ postRouter.get('/', async (req, res, next) => {
 });
 
 // GET /posts/:postId: Ottieni un post specifico tramite ID
-postRouter.get('/posts/:postId', async (req, res, next) => {
+postRouter.get('/:postId', async (req, res, next) => {
     try {
         if (!mongoose.Types.ObjectId.isValid(req.params.postId)) {
             return next(createError(400, "ID Post non valido"));
@@ -39,7 +39,7 @@ postRouter.get('/posts/:postId', async (req, res, next) => {
 });
 
 // PUT /posts/:postId: Aggiorna un post esistente (richiede autenticazione)
-postRouter.put('/posts/:postId', authMiddleware, async (req, res, next) => {
+postRouter.put('/:postId', authMiddleware, async (req, res, next) => {
     try {
         if (!mongoose.Types.ObjectId.isValid(req.params.postId)) {
             return next(createError(400, "ID Post non valido"));
@@ -56,7 +56,7 @@ postRouter.put('/posts/:postId', authMiddleware, async (req, res, next) => {
 });
 
 // DELETE /posts/:postId: Elimina un post (richiede autenticazione)
-postRouter.delete('/posts/:postId', authMiddleware, async (req, res, next) => {
+postRouter.delete('/:postId', authMiddleware, async (req, res, next) => {
     try {
         if (!mongoose.Types.ObjectId.isValid(req.params.postId)) {
             return next(createError(400, "ID Post non valido"));
@@ -97,7 +97,7 @@ postRouter.post('/posts', authMiddleware, postCover, async (req, res, next) => {
 });
 
 // PATCH /posts/:postId/cover: Aggiorna l'immagine di copertina di un post (richiede autenticazione)
-postRouter.patch('/posts/:postId/cover', authMiddleware, postCover, async (req, res, next) => {
+postRouter.patch('/:postId/cover', authMiddleware, postCover, async (req, res, next) => {
     try {
         const updatedPost = await Post.findByIdAndUpdate(
             req.params.postId,
@@ -113,7 +113,7 @@ postRouter.patch('/posts/:postId/cover', authMiddleware, postCover, async (req, 
     }
 });
 // POST /posts/:postId/comments: Aggiungi un commento a un post
-postRouter.post('/posts/:postId/comments', async (req, res, next) => {
+postRouter.post('/:postId/comments', async (req, res, next) => {
     try {
         const comment = await Comment.create(req.body);
         const post = await Post.findByIdAndUpdate(

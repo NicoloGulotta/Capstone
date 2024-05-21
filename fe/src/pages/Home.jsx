@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Spinner, Alert } from 'react-bootstrap';
-import { Link } from 'react-router-dom'; // Importato Link per la navigazione
-import immagineHero from '../hero.jpg'; // Importato immagine hero (assicurati che il percorso sia corretto)
-import '../Home/Home.css'
+import { Link, useNavigate } from 'react-router-dom';
+import immagineHero from '../assets/images/hero.jpg';
+import '../styles/Home.css';
 
 function Servizi() {
   const [servizi, setServizi] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -17,7 +18,11 @@ function Servizi() {
           throw new Error('Errore nella risposta dal server');
         }
         const data = await response.json();
-        setServizi(data);
+        if (Array.isArray(data)) {
+          setServizi(data);
+        } else {
+          throw new Error('Formato dati non valido');
+        }
       } catch (error) {
         console.error('Errore nel caricamento dei servizi:', error);
         setError(error.message);
@@ -31,12 +36,14 @@ function Servizi() {
 
   return (
     <Container>
-      <div className="hero">
-        <img src={immagineHero} alt="Hero Image" />
-        <div className="hero-content"> {/* Aggiunto un contenitore per il testo */}
+      {/* Sezione Hero */}
+      <div className="hero" style={{ backgroundImage: `url(${immagineHero})` }}>
+        <img src={immagineHero} alt="Barbiere al lavoro" className="img-fluid" /> {/* Aggiunto img-fluid */}
+        <div className="hero-content">
           <Container>
             <h1>Il Tuo Stile, la Nostra Passione</h1>
             <p>Scopri i nostri servizi di taglio, barba e cura della persona.</p>
+            <Button variant="primary" as={Link} to="/prenota">Prenota ora</Button>
           </Container>
         </div>
       </div>
@@ -60,8 +67,9 @@ function Servizi() {
                     <Card.Body>
                       <Card.Title>{servizio.title}</Card.Title>
                       <Card.Text>{servizio.content}</Card.Text>
-                      <Button variant="primary" as={Link} to="/prenota">Prenota</Button>
-                      {/* Usato Link per la navigazione */}
+                      <Button variant="primary" onClick={() => navigate(`/${servizio._id}`)}>
+                        Prenota
+                      </Button>
                     </Card.Body>
                   </Card>
                 </Col>
