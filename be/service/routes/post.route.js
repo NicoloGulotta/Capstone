@@ -12,7 +12,7 @@ config(); // Carica le variabili d'ambiente
 const postRouter = Router();
 
 // GET /posts: Ottieni tutti i post
-postRouter.get('/posts', async (req, res, next) => {
+postRouter.get('/', async (req, res, next) => {
     try {
         const posts = await Post.find().populate(["author", "comments"]);
         res.send(posts);

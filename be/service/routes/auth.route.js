@@ -113,4 +113,3 @@ authRouter.get('/callback',
 //console.log(process.env.FRONTEND_URL);
 //console.log(process.env.G_CALLBACK_URL);
 export default authRouter;
-console.log

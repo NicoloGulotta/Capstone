@@ -40,7 +40,7 @@ passport.use("google", googleStrategy);
 // Definizione delle route (dopo l'inizializzazione di Passport)
 app.use("/test", testRouter);        // Route di test (senza autenticazione)
 app.use("/auth", authRouter);       // Route di autenticazione
-app.use("/post", authMiddleware, postRouter);  // Route per i post (richiede autenticazione)
+app.use("/post", postRouter);  // Route per i post
 app.use("/appointment", authMiddleware, appointmentRouter); // Route per gli appuntamenti (richiede autenticazione)
 
 // Gestione degli errori centralizzata

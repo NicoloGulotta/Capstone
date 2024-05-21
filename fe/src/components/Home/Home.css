@@ -1,0 +1,54 @@
+/* Stili base per la sezione hero */
+.hero {
+  position: relative;
+  width: 100%;
+  height: 60vh; /* Altezza relativa alla viewport */
+  overflow: hidden;
+}
+
+.hero img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: white;
+  z-index: 10;
+  padding: 50px; /* Spaziatura interna per il testo */
+  background-color: rgba(0, 0, 0, 0.5); /* Sfondo semi-trasparente */
+}
+
+/* Stili specifici per elementi all'interno di hero-content */
+.hero-content h1 {
+  font-size: 3rem; /* Dimensione del titolo */
+  margin-bottom: 1rem;
+}
+
+.hero-content p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+  .hero {
+    height: 60vh;
+  }
+
+  .hero-content {
+    padding: 20px;
+  }
+
+  .hero-content h1 {
+    font-size: 2.5rem;
+  }
+
+  .hero-content p {
+    font-size: 1rem;
+  }
+}
