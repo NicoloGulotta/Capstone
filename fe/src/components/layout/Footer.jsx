@@ -12,7 +12,7 @@ function Footer() {
 
                         <ul className="list-unstyled mb-0">
                             <li>
-                                <a href="/" className="text-dark">Home</a>
+                                <a href="/home" className="text-dark">Home</a>
                             </li>
                             <li>
                                 <a href="#!" className="text-dark">Contatti</a>
