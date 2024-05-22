@@ -1,18 +1,17 @@
-import React, { useState, useEffect, useContext, navigate } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { Container, Alert } from 'react-bootstrap';
-import GoogleAuth from './components/common/GoogleAuth';
+import { Container, Alert, Spinner } from 'react-bootstrap';
+import GoogleAuth from './components/layout/GoogleAuth';
 import Profile from './pages/Profile';
 import CreatePostForm from './pages/CreatePostForm';
 import Home from './pages/Home';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import PostDetails from './pages/PostDetails';
-import AuthContext from '../src/layout/';
-import { useFetchUserData } from './hooks/useFetchUserData';
+import AuthContext from './context/AuthContext';
+import { useFetchUserData } from './data/useFetchUserData';
 
-// PrivateRoute component (esempio)
 function PrivateRoute({ children }) {
   const { isLoggedIn } = useContext(AuthContext);
   return isLoggedIn ? children : <Navigate to="/" />;
@@ -22,32 +21,30 @@ function App() {
   const { isLoading, isLoggedIn, userData, login, logout, error } = useFetchUserData();
 
   const handleLogout = () => {
-    logout();
-    navigate('/'); // Reindirizza alla home dopo il logout
-  };
-
-  // Aggiornamento del context value
-  const contextValue = {
-    isLoggedIn,
-    userData,
-    login,
-    logout: handleLogout, // Passa la funzione handleLogout aggiornata
-    error
+    logout(); // Chiama la funzione logout dal custom hook
   };
 
   return (
     <BrowserRouter>
-      <AuthContext.Provider value={contextValue}>
-        <Navbar />
+      <AuthContext.Provider value={{ isLoggedIn, userData, login, logout, error }}>
+        <Navbar onLogout={handleLogout} />
         <Container>
-          {error && <Alert variant="danger">{error}</Alert>} {/* Mostra l'errore se presente */}
-          <Routes>
-            <Route path="/" element={isLoggedIn ? <Navigate to="/home" replace /> : <GoogleAuth />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/create-post" element={<PrivateRoute><CreatePostForm /></PrivateRoute>} />
-            <Route path="/auth/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
-            <Route path="/posts/:postId" element={<PostDetails />} />
-          </Routes>
+          {error && !isLoading && <Alert variant="danger">{error}</Alert>}
+          {isLoading ? (
+            <div className="d-flex justify-content-center align-items-center" style={{ height: '80vh' }}>
+              <Spinner animation="border" role="status" variant="primary">
+                <span className="visually-hidden">Caricamento in corso...</span>
+              </Spinner>
+            </div>
+          ) : (
+            <Routes>
+              {/* <Route path="/" element={isLoggedIn ? <Navigate to="/home" replace /> : <GoogleAuth />} /> */}
+              <Route path="/" element={<Home />} />
+              <Route path="/create-post" element={<PrivateRoute><CreatePostForm /></PrivateRoute>} />
+              <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+              <Route path="/posts/:postId" element={<PostDetails />} />
+            </Routes>
+          )}
         </Container>
         <Footer />
       </AuthContext.Provider>

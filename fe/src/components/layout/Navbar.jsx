@@ -1,35 +1,32 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { Container, Navbar, Nav, Image, Dropdown, NavDropdown } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import AuthContext from '../../context/AuthContext'; // Importa il contesto di autenticazione
+import React, { useContext } from 'react';
+import { Container, Navbar, Nav, Image, Dropdown } from 'react-bootstrap';
+import { Link, useNavigate } from 'react-router-dom';
+import AuthContext from '../../context/AuthContext';
 
-function MyNavbar() {
-    // Utilizza il contesto per ottenere lo stato di autenticazione e i dati utente
-    const { isLoggedIn, userData, logout } = useContext(AuthContext);
+function MyNavbar({ onLogout }) {
+    const { isLoggedIn, userData } = useContext(AuthContext);
+    const navigate = useNavigate();
 
-    // Non è più necessario useEffect qui, poiché i dati utente vengono gestiti nel contesto
+    const handleLogout = () => {
+        onLogout();
+        navigate('/');
+    };
 
     return (
-        <Navbar bg="light" expand="lg">
+        <Navbar bg="light" expand="lg" className="mb-3">
             <Container>
                 <Navbar.Brand as={Link} to="/">ScissorHand</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">
-                        {/* Altri link di navigazione */}
-                        <Nav.Link as={Link} to="/">Home</Nav.Link>
-                        <Nav.Link as={Link} to="/servizi">Servizi</Nav.Link>
-                        <Nav.Link as={Link} to="/prenota">Prenota</Nav.Link>
-                        <NavDropdown title="Altro" id="basic-nav-dropdown">
-                            <NavDropdown.Item as={Link} to="/contatti">Contatti</NavDropdown.Item>
-                            <NavDropdown.Item as={Link} to="/chi-siamo">Chi siamo</NavDropdown.Item>
-                        </NavDropdown>
+                        {/* ... altri link di navigazione ... */}
                     </Nav>
                     <Nav>
-                        {isLoggedIn && userData ? ( // Controllo se l'utente è loggato e se i dati sono disponibili
+                        {isLoggedIn && userData ? (
                             <Dropdown align="end">
-                                <Dropdown.Toggle variant="link" id="dropdown-user">
-                                    <Image src={userData.avatar} roundedCircle width="30" height="30" alt="Avatar utente" />
+                                <Dropdown.Toggle variant="link" id="dropdown-user" className="d-flex align-items-center">
+                                    <Image src={userData.avatar || 'path/to/default-avatar.jpg'}
+                                        roundedCircle width="30" height="30" alt="Avatar utente" />
                                     <span className="ms-2">{userData.name}</span>
                                 </Dropdown.Toggle>
 
@@ -37,7 +34,7 @@ function MyNavbar() {
                                     <Dropdown.Item as={Link} to="/profile">Profilo</Dropdown.Item>
                                     <Dropdown.Item as={Link} to="/settings">Impostazioni</Dropdown.Item>
                                     <Dropdown.Divider />
-                                    <Dropdown.Item onClick={logout}>Logout</Dropdown.Item>
+                                    <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
                         ) : (
