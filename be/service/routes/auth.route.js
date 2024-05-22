@@ -112,6 +112,7 @@ authRouter.get('/callback',
                 return next(createError(401, 'Authentication failed'));
             }
             console.log(req);
+            console.log(req.user.accessToken);
             res.redirect(`${process.env.FRONTEND_URL}?accessToken=${req.user.accessToken}`);
         } catch (error) {
             next(error);

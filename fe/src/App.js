@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Container, Alert, Spinner } from 'react-bootstrap';
-import GoogleAuth from './components/layout/GoogleAuth';
 import Profile from './pages/Profile';
 import CreatePostForm from './pages/CreatePostForm';
 import Home from './pages/Home';
@@ -12,23 +11,31 @@ import PostDetails from './pages/PostDetails';
 import AuthContext from './context/AuthContext';
 import { useFetchUserData } from './data/useFetchUserData';
 import Login from './components/commons/Login';
-import Registration from './components/commons/Registration';
+import RegistrationForm from './components/commons/Registration';
+
 function PrivateRoute({ children }) {
-  const { isLoggedIn } = useContext(AuthContext);
-  return isLoggedIn ? children : <Navigate to="/" />;
+  const { isAuthenticated } = useContext(AuthContext); // Estrai solo isAuthenticated
+  return isAuthenticated ? children : <Navigate to="/login" />;
 }
 
 function App() {
-  const { isLoading, isLoggedIn, userData, login, logout, error } = useFetchUserData();
+  const { isLoading, isLoggedIn, userData, login, logout, error, clearError } = useFetchUserData();
+  const [reloadNavbar, setReloadNavbar] = useState(false);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      setReloadNavbar(prev => !prev); // forza il re-render di Navbar
+    }
+  }, [isLoggedIn]); // Il componente verrà ri-renderizzato quando lo stato cambia
 
   const handleLogout = () => {
-    logout(); // Chiama la funzione logout dal custom hook
+    logout();
   };
 
   return (
     <BrowserRouter>
-      <AuthContext.Provider value={{ isLoggedIn, userData, login, logout, error }}>
-        <Navbar onLogout={handleLogout} />
+      <AuthContext.Provider value={{ isLoggedIn, userData, login, logout, error, clearError }}>
+        <Navbar onLogout={handleLogout} reloadNavbar={reloadNavbar} />
         <Container>
           {error && !isLoading && <Alert variant="danger">{error}</Alert>}
           {isLoading ? (
@@ -39,10 +46,9 @@ function App() {
             </div>
           ) : (
             <Routes>
-              {/* <Route path="/" element={isLoggedIn ? <Navigate to="/home" replace /> : <GoogleAuth />} /> */}
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Registration />} />
+              <Route path="/registrazione" element={<RegistrationForm />} />
               <Route path="/create-post" element={<PrivateRoute><CreatePostForm /></PrivateRoute>} />
               <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
               <Route path="/post/:postId" element={<PostDetails />} />

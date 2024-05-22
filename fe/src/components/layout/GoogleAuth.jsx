@@ -1,11 +1,11 @@
 import React from 'react'
-
+import { Button } from 'react-bootstrap'
 export default function GoogleAuth() {
     const hendlegoogleAuth = () => {
         const str = "http://localhost:3001/auth/googlelogin";
         window.open(str, "_self")
     };
     return (
-        <button onClick={hendlegoogleAuth}>Accedi con google</button>
+        <Button className="bg-dark mt-3" onClick={hendlegoogleAuth}>Accedi con google</Button>
     )
 };

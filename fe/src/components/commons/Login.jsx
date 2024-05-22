@@ -1,91 +1,102 @@
-import React, { useState } from 'react';
-import { Form, Button } from 'react-bootstrap';
+import React, { useState, useContext } from 'react';
+import { Form, Button, Alert } from 'react-bootstrap';
 import '../../styles/Login.css';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import AuthContext from '../../context/AuthContext';
+import GoogleAuth from '../layout/GoogleAuth';
+
 const LoginForm = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState(null);
+    const { login, error, clearError } = useContext(AuthContext);
+    const navigate = useNavigate();
+
+    const [formData, setFormData] = useState({
+        email: '',
+        password: '',
+    });
+
     const [loading, setLoading] = useState(false);
 
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        if (!email || !password) {
-            setError('Please fill in all fields');
+        // Validazione dei campi
+        if (!formData.email || !formData.password) {
+            error('Compila tutti i campi');
             return;
         }
 
         setLoading(true);
 
         try {
-            const response = await fetch('http://localhost:3001/Users/login', {
+            const response = await fetch('http://localhost:3001/auth/login', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, password }),
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData),
             });
 
             if (!response.ok) {
                 const errorData = await response.json();
-                setError(errorData.message || 'Login failed');
+                error(errorData.message || 'Login fallito');
             } else {
                 const data = await response.json();
                 const token = data.token;
-                const User = data.User;
-
-                // Store the token in local storage
-                localStorage.setItem('authToken', token);
-
-                // Redirect to the homepage or dashboard
-                window.location.href = '/home';
+                const user = data.user;
+                console.log(token, user);
+                login(user, token); // Chiama la funzione di login dal contesto
+                navigate('/'); // Reindirizza alla homepage dopo il login riuscito
             }
         } catch (error) {
-            setError(error.message || 'An error occurred');
+            error(error.message || 'Si è verificato un errore');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className='d-flex align-items-center login-form justify-content-center vh-100'>
-            <div className='p-3 rounded bg-black w-25 text-white login-container'>
-                <h2 className='login-title'>Login</h2>
-                {error && <p className="text-danger">{error}</p>}
+        <div className="d-flex align-items-center login-form justify-content-center vh-100">
+            <div className="p-3 rounded bg-black w-25 text-white login-container">
+                <h2 className="login-title">Login</h2>
                 <Form onSubmit={handleSubmit}>
-                    <Form.Group className="mb-3">
-                        <Form.Label htmlFor="inputEmail">Email address</Form.Label>
+                    <Form.Group >
+                        <Form.Label htmlFor="email">Indirizzo Email</Form.Label>
                         <Form.Control
                             type="email"
-                            id="inputEmail"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
                             required
-                            placeholder="Enter email"
+                            placeholder="Inserisci email"
                             autoComplete="email"
-                            autocorrect="off"
-                            autocapitalize="off"
+                            autoCorrect="off"
+                            autoCapitalize="off"
                         />
                     </Form.Group>
-                    <Form.Group className="mb-3">
-                        <Form.Label htmlFor="inputPassword5">Password</Form.Label>
+
+                    <Form.Group >
+                        <Form.Label htmlFor="password">Password</Form.Label>
                         <Form.Control
                             type="password"
-                            id="inputPassword5"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
                             required
                             minLength={8}
-                            placeholder="Enter password"
+                            placeholder="Inserisci password"
                         />
-                        <Button as={Link} to="/registration" className=" bg-dark mt-3" >Registrati</Button>
-
                     </Form.Group>
 
                     <Button type="submit" className="btn m-2 d-flex btn-primary align-items-center justify-content-center">
-                        {loading ? 'Loading...' : 'Accedi'}
+                        {loading ? 'Caricamento...' : 'Accedi'}
                     </Button>
+
+                    <Button as={Link} to="/registration" className="bg-dark mt-3">
+                        Registrati
+                    </Button>
+
+                    <GoogleAuth buttonText="Login con Google" className="bg-dark mt-3" />
                 </Form>
             </div>
         </div>

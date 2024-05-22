@@ -1,48 +1,46 @@
 import { useState, useEffect, useContext } from "react";
 import AuthContext from "../context/AuthContext";
 
-export const useFetchUserData = () => {
-    // rimuovi setError da qui
-    const { setIsLoggedIn, setUserData } = useContext(AuthContext);
+export function useFetchUserData() {
+    const { login, logout, error, clearError, setError } = useContext(AuthContext); //Get the error from context
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null); // Move error state declaration here
+    const [userData, setUserData] = useState(null); // Initialize userData here
 
     useEffect(() => {
-        const fetchData = async () => {
-            const token = localStorage.getItem("token");
-            if (token) {
-                try {
-                    const response = await fetch("http://localhost:3001/auth/profile", {
+        const fetchUserData = async () => {
+            try {
+                const token = localStorage.getItem("token");
+                if (token) {
+                    const response = await fetch("http://localhost:3001/auth/me", {
                         headers: { Authorization: `Bearer ${token}` },
                     });
-
-                    // Check if the request was successful (status code 200-299)
                     if (response.ok) {
                         const data = await response.json();
-                        setIsLoggedIn(true);
+                        login(data, token);
                         setUserData(data);
+                        clearError();
                     } else {
-                        // Throw an error if the request was not successful
-                        throw new Error(
-                            "Errore nella risposta dal server: " + response.statusText
-                        );
+                        logout();
+                        setError("Token scaduto o non valido"); // Imposta un messaggio di errore specifico
                     }
-                } catch (error) {
-                    console.error("Errore nel recupero dei dati utente:", error);
-                    setError(error.message);
-                    setIsLoggedIn(false);
-                    setUserData(null);
-                } finally {
-                    setIsLoading(false);
                 }
-            } else {
+            } catch (err) {
+                setError(err.message || "An error occurred while fetching user data");
+                localStorage.removeItem('token');
+            } finally {
                 setIsLoading(false);
             }
         };
+        fetchUserData();
+    }, [login, logout, setError, clearError]); // Add dependencies
 
-        fetchData();
-    }, [setIsLoggedIn, setUserData]);
-
-    return { isLoading, setIsLoggedIn, setUserData, error }; // Include error in the returned object
-};
-
+    return {
+        isLoading,
+        isLoggedIn: !!userData,
+        userData,
+        login,
+        logout,
+        error,
+        clearError,
+    };
+}
