@@ -43,7 +43,6 @@ function Servizi() {
           <Container>
             <h1>Il Tuo Stile, la Nostra Passione</h1>
             <p>Scopri i nostri servizi di taglio, barba e cura della persona.</p>
-            <Button variant="primary" as={Link} to="/prenota">Prenota ora</Button>
           </Container>
         </div>
       </div>
@@ -67,7 +66,7 @@ function Servizi() {
                     <Card.Body>
                       <Card.Title>{servizio.title}</Card.Title>
                       <Card.Text>{servizio.content}</Card.Text>
-                      <Button variant="primary" onClick={() => navigate(`/${servizio._id}`)}>
+                      <Button variant="primary" onClick={() => navigate(`post/${servizio._id}`)}>
                         Prenota
                       </Button>
                     </Card.Body>

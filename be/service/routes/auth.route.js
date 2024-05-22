@@ -92,19 +92,26 @@ authRouter.get('/check-admin', authMiddleware, async (req, res, next) => {
     }
 });
 
-authRouter.get('/googlelogin',
+authRouter.get('/googlelogin', (req, res, next) => {
+    // Set CORS headers before starting authentication
+    res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+    // Then, proceed with authentication
     passport.authenticate("google", {
         scope: ["profile", "email"],
         callbackURL: process.env.G_CALLBACK_URL
-    })
-);
+    })(req, res, next); // Call the middleware with req, res, next
+});
+
 authRouter.get('/callback',
     passport.authenticate("google", { session: false }), (req, res, next) => {
         try {
             if (!req.user || !req.user.accessToken) {
                 return next(createError(401, 'Authentication failed'));
             }
-            // console.log(req);
+            console.log(req);
             res.redirect(`${process.env.FRONTEND_URL}?accessToken=${req.user.accessToken}`);
         } catch (error) {
             next(error);

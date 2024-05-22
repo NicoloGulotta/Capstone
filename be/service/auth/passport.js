@@ -9,7 +9,7 @@ const options = {
     callbackURL: process.env.G_CALLBACK_URL
 };
 
-console.log(options);
+//console.log(options);
 
 const googleStrategy = new GoogleStrategy(options, async (_accessToken, _refreshToken, profile, done) => {
     try {

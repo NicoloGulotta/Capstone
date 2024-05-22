@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
-import './Login.css';
+import '../../styles/Login.css';
 import { Link } from 'react-router-dom';
 const LoginForm = () => {
     const [email, setEmail] = useState('');
@@ -19,7 +19,7 @@ const LoginForm = () => {
         setLoading(true);
 
         try {
-            const response = await fetch('http://localhost:3001/authors/login', {
+            const response = await fetch('http://localhost:3001/Users/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -33,7 +33,7 @@ const LoginForm = () => {
             } else {
                 const data = await response.json();
                 const token = data.token;
-                const Author = data.Author;
+                const User = data.User;
 
                 // Store the token in local storage
                 localStorage.setItem('authToken', token);
