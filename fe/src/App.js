@@ -11,7 +11,8 @@ import Footer from './components/layout/Footer';
 import PostDetails from './pages/PostDetails';
 import AuthContext from './context/AuthContext';
 import { useFetchUserData } from './data/useFetchUserData';
-
+import RegistrationForm from './components/commons/Registration';
+import Login from './components/commons/Login';
 function PrivateRoute({ children }) {
   const { isLoggedIn } = useContext(AuthContext);
   return isLoggedIn ? children : <Navigate to="/" />;
@@ -40,6 +41,8 @@ function App() {
             <Routes>
               {/* <Route path="/" element={isLoggedIn ? <Navigate to="/home" replace /> : <GoogleAuth />} /> */}
               <Route path="/" element={<Home />} />
+              <Route path="/register" element={<RegistrationForm />} />
+              <Route path="/login" elemnt={<Login />} />
               <Route path="/create-post" element={<PrivateRoute><CreatePostForm /></PrivateRoute>} />
               <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
               <Route path="/posts/:postId" element={<PostDetails />} />

@@ -31,7 +31,13 @@ config();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000',  // Rimani specifico sull'origine
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Includi 'OPTIONS'
+    allowedHeaders: ['Content-Type', 'Authorization'], // Aggiungi 'Authorization'
+    credentials: true, // Abilita le credenziali (se necessario)
+}));
+
 app.use(express.json());
 
 //utiliziamo la googleStrategy

@@ -1,0 +1,61 @@
+.login-form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh; /* Fills the viewport height */
+  background-color: #f0f0f0; /* Light gray background */
+}
+
+.login-container {
+  padding: 30px;
+  border-radius: 5px;
+  background-color: #333; /* Dark gray background */
+  color: #fff; /* White text color */
+  width: 300px; /* Set a width for the login form */
+}
+
+.login-title {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.form-control {
+  border: 1px solid #ccc; /* Light gray border */
+  border-radius: 4px;
+  padding: 10px;
+  font-size: 16px;
+}
+
+.form-control:focus {
+  border-color: #66afe9; /* Blue border on focus */
+  outline: none; /* Remove default outline */
+}
+
+.error-message {
+  color: red;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.submit-button {
+  background-color: #4caf50; /* Green button color */
+  border-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.submit-button:hover {
+  background-color: #3e8e41; /* Darker green on hover */
+}
