@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Spinner, Alert } from 'react-bootstrap';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import immagineHero from '../assets/images/hero.jpg';
 import '../styles/Home.css';
 
@@ -18,6 +18,7 @@ function Servizi() {
           throw new Error('Errore nella risposta dal server');
         }
         const data = await response.json();
+        console.log(data);
         if (Array.isArray(data)) {
           setServizi(data);
         } else {
@@ -60,7 +61,7 @@ function Servizi() {
             <h2>I Nostri Servizi</h2>
             <Row>
               {servizi.map((servizio) => (
-                <Col key={servizio._id} md={4}>
+                <Col key={servizio._id} md={6} lg={4}>
                   <Card>
                     <Card.Img variant="top" src={servizio.image} alt={servizio.title} />
                     <Card.Body>

@@ -4,19 +4,19 @@ import React, { createContext, useState, useEffect } from "react";
 export const AuthContext = createContext({
     isAuthenticated: false,
     user: null,
-    login: (user, token) => { },
+    login: () => { },
     logout: () => { },
     error: null,
-    clearError: () => { },
+    setError: () => { },
+    isLoggedOut: false, // Aggiunto per gestire il logout
 });
 
 // Provider del contesto di autenticazione
 export const AuthProvider = ({ children }) => {
-    const [authState, setAuthState] = useState({
-        isAuthenticated: false,
-        user: null,
-    });
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [user, setUser] = useState(null);
     const [error, setError] = useState(null);
+    const [isLoggedOut, setIsLoggedOut] = useState(false); // Stato per gestire il logout
 
     // Verifica se ci sono token e dati utente memorizzati nel localStorage al caricamento
     useEffect(() => {
@@ -24,40 +24,40 @@ export const AuthProvider = ({ children }) => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
 
         if (storedToken && storedUser) {
-            setAuthState({ isAuthenticated: true, user: storedUser });
+            setIsAuthenticated(true);
+            setUser(storedUser);
         }
     }, []);
 
     // Funzione per gestire il login
-    const login = (userData, token) => {
-        localStorage.setItem("token", token);
+    const login = (userData) => {
+        setIsAuthenticated(true);
+        setUser(userData);
+        setIsLoggedOut(false);
+        localStorage.setItem("token", userData.token);
         localStorage.setItem("user", JSON.stringify(userData));
-        setAuthState({ isAuthenticated: true, user: userData });
-        setError(null);
     };
 
     // Funzione per gestire il logout
-    const logout = () => {
-        localStorage.removeItem("token");
+    const logout = (userData) => {
+        localStorage.removeItem("token", userData.token);
         localStorage.removeItem("user");
-        setAuthState({ isAuthenticated: false, user: null });
-    };
-
-    // Funzione per cancellare eventuali errori
-    const clearError = () => {
-        setError(null);
+        setIsAuthenticated(false);
+        setUser(null);
+        setIsLoggedOut(true);
     };
 
     // Ritorna il Provider del contesto, rendendo disponibili le funzioni e i dati ai componenti figli
     return (
         <AuthContext.Provider
             value={{
-                ...authState,
+                isAuthenticated,
+                user,
                 login,
                 logout,
                 error,
                 setError,
-                clearError
+                isLoggedOut,
             }}
         >
             {children}

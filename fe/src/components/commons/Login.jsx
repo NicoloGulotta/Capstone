@@ -6,7 +6,7 @@ import { AuthContext } from "../../context/AuthContext";
 
 function Login() {
     // Ottieni le funzioni e i valori dal contesto di autenticazione
-    const { login, error, clearError, setError } = useContext(AuthContext);
+    const { login, error, setError } = useContext(AuthContext);
     // Definisci lo stato locale per i dati del form (email e password)
     const [formData, setFormData] = useState({
         email: "",
@@ -21,8 +21,7 @@ function Login() {
 
     // Funzione per gestire l'invio del form
     const handleSubmit = async (e) => {
-        e.preventDefault(); // Previeni il comportamento di invio predefinito del form
-        clearError(); // Pulisci eventuali errori precedenti
+        e.preventDefault();
 
         try {
             const response = await fetch("http://localhost:3001/auth/login", {
@@ -31,31 +30,27 @@ function Login() {
                 body: JSON.stringify(formData),
             });
 
-            // Se la richiesta ha avuto successo
             if (response.ok) {
                 const data = await response.json();
-                // Verifica se il token è stato restituito
-                if (data.token) {
-                    // Salva il token nel localStorage
-                    localStorage.setItem("token", data.token);
 
-                    login(data.user, data.token); // Autentica l'utente (aggiorna lo stato nel contesto)
-                    navigate("/home"); // Reindirizza alla home
+                if (data.token) {
+                    localStorage.setItem("token", data.token);
+                    login(data); // Passa l'intero oggetto data a login
+                    navigate("/");
                 } else {
                     setError("Autenticazione fallita. Token mancante nella risposta.");
                 }
             } else {
-                // Se la richiesta non ha avuto successo (es. credenziali errate)
                 const errorData = await response.json();
-                setError(errorData.message || "Login fallito. Verifica le tue credenziali.");
+                setError(
+                    errorData.message || "Login fallito. Verifica le tue credenziali."
+                );
             }
         } catch (err) {
-            // In caso di errore di rete o altri problemi
             console.error("Errore durante la richiesta di login:", err);
             setError("Errore di rete o del server. Riprova più tardi.");
         }
     };
-
     // Restituisci il JSX del componente
     return (
         <div>

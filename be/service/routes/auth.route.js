@@ -78,7 +78,7 @@ authRouter.post("/login", async (req, res, next) => {
 
 authRouter.get("/profile", authMiddleware, async (req, res, next) => {
     try {
-        const user = await User.findById(req.user._id).select("name email"); // Proietta solo i campi necessari
+        const user = await User.findById(req.user._id).select("name surname email comments role appointments "); // Proietta solo i campi necessari
 
         if (!user) {
             return res.status(404).json({ message: "Utente non trovato" }); // Errore 404 se l'utente non esiste

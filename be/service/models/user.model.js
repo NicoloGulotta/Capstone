@@ -33,7 +33,7 @@ const userSchema = new Schema(
         },
         avatar: {
             type: String,
-            default: "https://ui-avatars.com/api/",
+            required: false,
         },
         password: {
             type: String,
