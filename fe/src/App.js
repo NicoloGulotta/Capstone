@@ -26,10 +26,15 @@ import { useFetchUserData } from "./data/useFetchUserData";
 // }
 
 function App() {
-  const { isLoading, error } = useFetchUserData();
+  const { isLoading, error, } = useFetchUserData();
 
-  const logout = () => {
-    localStorage.removeItem("user", "token"); // Rimuovi l'intero oggetto utente
+  const logout = (e) => {
+    e.preventDefault();
+    // Cancella il Local Storage (opzionale)
+    localStorage.clear();
+
+    // Ricarica la pagina e vai a "/home"
+    window.location.reload("/");
   };
   return (
     <BrowserRouter>

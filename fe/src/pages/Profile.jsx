@@ -1,13 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { Alert } from "react-bootstrap";
-
+import { useNavigate } from "react-router-dom";
 function Profile() {
     const { isAuthenticated } = useContext(AuthContext);
     const [profileData, setProfileData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchProfileData = async () => {
@@ -26,9 +26,6 @@ function Profile() {
                     if (response.ok) {
                         const data = await response.json();
                         console.log(data);
-                        const user = data;
-                        const id = user._id
-                        localStorage.setItem("userId", id, user);
                         setProfileData(data);
                     } else {
                         setError("Errore nel recupero dei dati del profilo.");
@@ -58,7 +55,8 @@ function Profile() {
                     <p>Appuntamenti: {profileData.appointments}</p>
                 </div>
             ) : (
-                <p>Utente non trovato.</p>
+                <Alert>Stai per uscire da ScisorHand</Alert>
+                , navigate("/")
             )}
         </div>
     );

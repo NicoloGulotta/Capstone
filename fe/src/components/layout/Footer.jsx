@@ -8,20 +8,16 @@ function Footer() {
                 <Row>
 
                     <Col lg={3} md={6} mb={4} mb-md={0}>
-                        <h5 className="text-uppercase">Link utili</h5>
 
                         <ul className="list-unstyled mb-0">
                             <li>
-                                <a href="/home" className="text-dark">Home</a>
                             </li>
-                            <li>
-                                <a href="#!" className="text-dark">Contatti</a>
-                            </li>
+
                         </ul>
                     </Col>
 
                     <Col lg={3} md={6} mb={4} mb-md={0}>
-                        <h5 className="text-uppercase mb-0">Social</h5>
+                        <h5 className="text-uppercase mb-0">Seguici sui nostri social</h5>
 
                         <ul className="list-unstyled">
                             <li>
@@ -34,6 +30,7 @@ function Footer() {
                     </Col>
                 </Row>
             </Container>
+            <a href="/" className="text-dark">Torna su</a>
 
             <div className="text-center p-3" style={{ backgroundColor: 'rgba(0, 0, 0, 0.2)' }}>
                 © 2023 Copyright:
