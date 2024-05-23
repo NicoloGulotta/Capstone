@@ -30,11 +30,12 @@ function App() {
 
   const logout = (e) => {
     e.preventDefault();
+
     // Cancella il Local Storage (opzionale)
     localStorage.clear();
 
     // Ricarica la pagina e vai a "/home"
-    window.location.reload("/");
+    window.location.href("/");
   };
   return (
     <BrowserRouter>

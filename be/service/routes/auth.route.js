@@ -125,6 +125,8 @@ authRouter.get('/callback',
             }
             console.log(req);
             console.log(req.user.accessToken);
+            // localStorage.setItem("token", req.user.accessToken);
+            //  localStorage.setItem("user", JSON.stringify(req.user));
             res.redirect(`${process.env.FRONTEND_URL}?accessToken=${req.user.accessToken}`);
         } catch (error) {
             next(error);

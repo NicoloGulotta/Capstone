@@ -3,7 +3,7 @@ import React, { useState, useContext } from "react";
 import { Form, Button, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
-
+import GoogleAuth from "../layout/GoogleAuth";
 function Login() {
     // Ottieni le funzioni e i valori dal contesto di autenticazione
     const { login, error, setError } = useContext(AuthContext);
@@ -78,10 +78,10 @@ function Login() {
                         onChange={handleChange}
                     />
                 </Form.Group>
-
                 <Button variant="primary" type="submit">
                     Login
                 </Button>
+                <GoogleAuth />
             </Form>
         </div>
     );
