@@ -1,13 +1,16 @@
-import React, { useContext } from "react";
-import { Container, Navbar, Nav, Image, Dropdown } from "react-bootstrap";
+import React, { useContext, useState } from "react";
+import { Container, Navbar, Nav, Image, Dropdown, Button, Modal } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 
 function MyNavbar({ onLogout }) {
     const { isAuthenticated, user } = useContext(AuthContext);
+    const [showModal, setShowModal] = useState(false);
 
+    const handleClose = () => setShowModal(false);
+    const handleShow = () => setShowModal(true);
     return (
-        <Navbar bg="light" expand="lg" className="mb-3">
+        <Navbar bg="dark" expand="lg" className="mb-3">
             <Container>
                 {/* Brand/Logo */}
                 <Navbar.Brand as={Link} to="/">
@@ -30,6 +33,26 @@ function MyNavbar({ onLogout }) {
                                 Crea Post
                             </Nav.Link>
                         )} */}
+                        <Button variant="outline-primary" onClick={handleShow}>
+                            Contattaci
+                        </Button>
+
+                        <Modal show={showModal} onHide={handleClose}>
+                            <Modal.Header closeButton>
+                                <Modal.Title>Contattaci</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                <p>
+                                    Puoi contattarci al numero di telefono 123-456-7890 o all'indirizzo email info@hairsalon.com.
+                                </p>
+                            </Modal.Body>
+                            <Modal.Footer>
+                                <Button variant="secondary" onClick={handleClose}>
+                                    Chiudi
+                                </Button>
+                            </Modal.Footer>
+                        </Modal>
+
                     </Nav>
 
                     <Nav>
@@ -79,7 +102,7 @@ function MyNavbar({ onLogout }) {
                     </Nav>
                 </Navbar.Collapse>
             </Container>
-        </Navbar>
+        </Navbar >
     );
 }
 

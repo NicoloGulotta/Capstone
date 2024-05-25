@@ -70,7 +70,7 @@ function App() {
             </Routes>
           )}
         </Container>
-        <Footer />
+        <Footer style={{ marginTop: "auto" }} />
       </AuthProvider>
     </BrowserRouter>
   );

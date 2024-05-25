@@ -16,3 +16,6 @@
 }
 
 /* Aggiungi altri stili per altri componenti come necessario */
+footer {
+  margin-top: auto; /* Spinge il footer in fondo */
+}

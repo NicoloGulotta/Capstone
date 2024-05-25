@@ -1,0 +1,11 @@
+.card-details {
+  width: 70%;
+  margin: 0 auto;
+  padding: 20px;
+}
+.card-img-top {
+  object-fit: fill;
+
+  width: 100%;
+  height: 600px; /* Imposta l'altezza desiderata per il contenitore dell'immagine */
+}
