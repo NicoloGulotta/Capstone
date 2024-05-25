@@ -10,7 +10,7 @@ function MyNavbar({ onLogout }) {
     const handleClose = () => setShowModal(false);
     const handleShow = () => setShowModal(true);
     return (
-        <Navbar bg="dark" expand="lg" className="mb-3">
+        <Navbar bg="dark" expand="lg" className="mb-3 navbar-dark">
             <Container>
                 {/* Brand/Logo */}
                 <Navbar.Brand as={Link} to="/">

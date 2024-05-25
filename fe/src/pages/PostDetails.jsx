@@ -47,7 +47,7 @@ function PostDetails() {
 
     // Check both post and user before accessing user._id
     if (!post || !user || !user.user) {
-        return <Alert variant="warning">Post or user information is missing.</Alert>;
+        return <Alert variant="warning">Effettua la registrazione o accedi per vedere i dettagli</Alert>;
     }
     console.log(post, user.user._id);
     return (

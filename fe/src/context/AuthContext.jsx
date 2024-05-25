@@ -1,4 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 
 // Creazione del contesto di autenticazione
 export const AuthContext = createContext({
@@ -39,12 +41,14 @@ export const AuthProvider = ({ children }) => {
     };
 
     // Funzione per gestire il logout
+    const navigate = useNavigate();
     const logout = (userData) => {
         localStorage.removeItem("token", userData.token);
         localStorage.removeItem("user");
         setIsAuthenticated(false);
         setUser(null);
         setIsLoggedOut(true);
+        navigate("/");
     };
 
     // Ritorna il Provider del contesto, rendendo disponibili le funzioni e i dati ai componenti figli
