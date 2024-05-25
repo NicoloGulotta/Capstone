@@ -2,9 +2,9 @@ import mongoose from 'mongoose';
 
 const appointmentSchema = new mongoose.Schema({
     serviceType: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Post',
         required: true,
-        enum: ['Consulenza', 'Taglio capelli', 'Manicure', 'Altro']
     },
     date: {
         type: Date,

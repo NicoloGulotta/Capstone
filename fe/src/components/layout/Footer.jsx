@@ -1,43 +1,89 @@
-import React from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
+import React, { useState } from 'react';
 
-function Footer() {
+const Footer = () => {
+    const [modalOpen, setModalOpen] = useState(false);
+    const [email, setEmail] = useState('');
+    const [message, setMessage] = useState('');
+
+    const handleModalToggle = () => setModalOpen(!modalOpen);
+    const handleEmailChange = (e) => setEmail(e.target.value);
+    const handleMessageChange = (e) => setMessage(e.target.value);
+
     return (
-        <footer className="bg-light text-center text-lg-start">
-            <Container className="p-4">
-                <Row>
-
-                    <Col lg={3} md={6} mb={4} mb-md={0}>
-
-                        <ul className="list-unstyled mb-0">
-                            <li>
-                            </li>
-
+        <footer className="d-flex justify-content-center py-0" style={{ color: 'lightgray' }}>
+            <div className="container-fluid row">
+                <div className="row my-3">
+                    <div className="row mb-2 justify-content-start">
+                        <i className="fa-brands fa-square-facebook col-auto px-2 text-secondary"></i>
+                        <i className="fa-brands fa-instagram col-auto px-2 text-secondary"></i>
+                        <i className="fa-brands fa-twitter col-auto px-2 text-secondary"></i>
+                        <i className="fa-brands fa-youtube col-auto px-2 text-secondary"></i>
+                    </div>
+                </div>
+                {['Privacy', 'Contact Us'].map((item, index) => (
+                    <div className="col-3" key={index}>
+                        <ul className="p-0 mb-2">
+                            <li className="list-group-item border-none mb-3 text-secondary">{item}</li>
                         </ul>
-                    </Col>
-
-                    <Col lg={3} md={6} mb={4} mb-md={0}>
-                        <h5 className="text-uppercase mb-0">Seguici sui nostri social</h5>
-
-                        <ul className="list-unstyled">
-                            <li>
-                                <a href="#!" className="text-dark">Facebook</a>
-                            </li>
-                            <li>
-                                <a href="#!" className="text-dark">Instagram</a>
-                            </li>
+                    </div>
+                ))}
+                {['Cookie Preferences'].map((item, index) => (
+                    <div className="col-3" key={index}>
+                        <ul className="p-0 mb-2">
+                            <li className="list-group-item border-none mb-3 text-secondary">{item}</li>
                         </ul>
-                    </Col>
-                </Row>
-            </Container>
-            <a href="/" className="text-dark">Torna su</a>
-
-            <div className="text-center p-3" style={{ backgroundColor: 'rgba(0, 0, 0, 0.2)' }}>
-                © 2023 Copyright:
-                <a className="text-dark" href="https://github.com/NicoloGulotta/Capstone.git">Nicolò Gulotta</a>
+                    </div>
+                ))}
+                {['Gift Cards', 'Terms of Use'].map((item, index) => (
+                    <div className="col-3" key={index}>
+                        <ul className="p-0 mb-2">
+                            <li className="list-group-item border-none mb-3 text-secondary">{item}</li>
+                        </ul>
+                    </div>
+                ))}
+                <div className="col-12 my-2">
+                    <button
+                        type="button"
+                        className="btn rounded-0 border-white my-2 text-secondary"
+                        onClick={handleModalToggle}
+                    >
+                        Contact Us
+                    </button>
+                    {modalOpen && (
+                        <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div className="modal-dialog">
+                                <div className="modal-content">
+                                    <div className="modal-header">
+                                        <h1 className="modal-title fs-5" id="exampleModalLabel">New message</h1>
+                                        <button type="button" className="btn-close" onClick={handleModalToggle} aria-label="Close"></button>
+                                    </div>
+                                    <div className="modal-body">
+                                        <form>
+                                            <div className="mb-3">
+                                                <label htmlFor="recipient-name" className="col-form-label">Inserisci email:</label>
+                                                <input type="text" className="form-control" id="recipient-name" value={email} onChange={handleEmailChange} />
+                                            </div>
+                                            <div className="mb-3">
+                                                <label htmlFor="message-text" className="col-form-label">Message:</label>
+                                                <textarea className="form-control" id="message-text" value={message} onChange={handleMessageChange}></textarea>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div className="modal-footer">
+                                        <button type="button" className="btn btn-secondary" onClick={handleModalToggle}>Close</button>
+                                        <button type="button" className="btn btn-primary">Send message</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    <div className="row text-secondary">
+                        © 2024 Nicolò Gulotta. All Rights Reserved.
+                    </div>
+                </div>
             </div>
         </footer>
     );
-}
+};
 
 export default Footer;

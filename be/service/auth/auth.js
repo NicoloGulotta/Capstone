@@ -26,8 +26,8 @@ export const verifyJWT = (token) =>
 
 // Middleware di autenticazione
 export const authMiddleware = async (req, res, next) => {
-    console.log("Headers:", req.headers); // Verifica gli header della richiesta
-    console.log("Auth:", req.headers.authorization);
+    // console.log("Headers:", req.headers); // Verifica gli header della richiesta
+    // console.log("Auth:", req.headers.authorization);
     try {
         const token = req.headers.authorization?.split(" ")[1]; // Estrai il token
 
@@ -36,9 +36,11 @@ export const authMiddleware = async (req, res, next) => {
         }
 
         const decodedToken = await verifyJWT(token); // Usa await per gestire la promessa
+        //localStorage.setItem('token', token);
+        //  localStorage.setItem('user', JSON.stringify(decodedToken));
         req.user = decodedToken;
-        console.log(token);
-        console.log(decodedToken);
+        // console.log(token);
+        // console.log(decodedToken);
         next();
     } catch (error) {
         console.error("Errore di autenticazione:", error);

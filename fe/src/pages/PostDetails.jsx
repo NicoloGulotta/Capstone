@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { Container, Card, Spinner, Alert } from 'react-bootstrap';
-
+import AppointmentForm from './AppointmentForm';
+import { AuthContext } from '../context/AuthContext';
 function PostDetails() {
     const { postId } = useParams(); // Ottieni l'ID del post dai parametri dell'URL
     const [post, setPost] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-
+    const { user } = useContext(AuthContext);
+    console.log(user);
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -39,12 +41,13 @@ function PostDetails() {
     return (
         <Container>
             <Card>
-                <Card.Img variant="top" src={post.image} alt={post.title} />
+                <Card.Img variant="top" src={post.picture} alt={post.title} className='ih-50' />
                 <Card.Body>
                     <Card.Title>{post.title}</Card.Title>
                     <Card.Text>{post.content}</Card.Text>
                 </Card.Body>
             </Card>
+            <AppointmentForm postId={postId} userId={user.user._id} />
         </Container>
     );
 }

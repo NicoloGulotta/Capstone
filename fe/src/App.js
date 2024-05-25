@@ -31,11 +31,11 @@ function App() {
   const logout = (e) => {
     e.preventDefault();
 
-    // Cancella il Local Storage (opzionale)
+    // Cancella il Local Storage 
     localStorage.clear();
 
     // Ricarica la pagina e vai a "/home"
-    window.location.href("/");
+    window.location.reload("/");
   };
   return (
     <BrowserRouter>

@@ -3,7 +3,7 @@ import { Container, Row, Col, Card, Button, Spinner, Alert } from 'react-bootstr
 import { useNavigate } from 'react-router-dom';
 import immagineHero from '../assets/images/hero.jpg';
 import '../styles/Home.css';
-
+import 'bootstrap/dist/css/bootstrap.min.css';
 function Servizi() {
   const [servizi, setServizi] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -59,11 +59,11 @@ function Servizi() {
         ) : (
           <>
             <h2>I Nostri Servizi</h2>
-            <Row>
+            <Row >
               {servizi.map((servizio) => (
-                <Col key={servizio._id} md={6} lg={4}>
-                  <Card>
-                    <Card.Img variant="top" src={servizio.image} alt={servizio.title} />
+                <Col key={servizio._id} md={6} lg={4} className="mb-4" itemID='servizi'>
+                  <Card style={{ height: '100%' }} >
+                    <Card.Img variant="top" src={servizio.cover} alt={servizio.title} />
                     <Card.Body>
                       <Card.Title>{servizio.title}</Card.Title>
                       <Card.Text>{servizio.content}</Card.Text>
