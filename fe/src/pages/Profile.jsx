@@ -26,6 +26,7 @@ function Profile() {
                     if (response.ok) {
                         const data = await response.json();
                         console.log(data);
+                        console.log(data.appointments);
                         setProfileData(data);
                     } else {
                         setError("Errore nel recupero dei dati del profilo.");
@@ -51,8 +52,10 @@ function Profile() {
                     <h1>Profilo di {profileData.name} {profileData.surname}</h1>
                     <p>Email: {profileData.email}</p>
                     <p>Commenti: {profileData.comments}</p>
+                    {/* // da creare sezione */}
                     {/* <p>Ruolo: {profileData.role}</p> */}
                     <p>Appuntamenti: {profileData.appointments}</p>
+                    {/* //non restituisce appointments */}
                 </div>
             ) : (
                 <Alert>Stai per uscire da ScisorHand</Alert>

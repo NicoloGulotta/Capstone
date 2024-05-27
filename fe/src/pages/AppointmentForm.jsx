@@ -2,40 +2,25 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-// import { formatISO } from 'date-fns';
-import { AuthContext } from '../context/AuthContext'; // Assicurati di importare il tuo contesto
 import { parse, format } from 'date-fns';
 import it from 'date-fns/locale/it';
-
-
-
+import { AuthContext } from '../context/AuthContext';
 
 function AppointmentForm({ postId }) {
-    const { user } = useContext(AuthContext); // Ottieni i dati dell'utente dal contesto
-    //console.log(user);
-    // Orario minimo (09:00)
+    const { user } = useContext(AuthContext);
     const minTime = parse("09:00", "HH:mm", new Date());
-
-    // Orario massimo (20:00)
     const maxTime = parse("20:00", "HH:mm", new Date());
+
     const [formData, setFormData] = useState({
         date: new Date(),
         notes: '',
-        status: 'In attesa',
         serviceType: postId,
-        user: user ? user._id : null, // Imposta l'ID utente se disponibile
+        // Not necessary to send user ID as the backend will get it from the authentication
     });
 
     const [showAlert, setShowAlert] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
     const [alertVariant, setAlertVariant] = useState('danger');
-
-    useEffect(() => {
-        // Aggiorna l'ID utente nello stato se cambia nel contesto
-        if (user) {
-            setFormData(prevData => ({ ...prevData, user: user._id }));
-        }
-    }, [user]); // Dipendenza dal contesto user
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -48,10 +33,9 @@ function AppointmentForm({ postId }) {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-
         const token = localStorage.getItem('token');
         if (!token) {
-            setAlertMessage('Non sei autenticato. Effettua il login per creare un appuntamento.');
+            setAlertMessage('Non sei autenticato.');
             setShowAlert(true);
             return;
         }
@@ -65,25 +49,22 @@ function AppointmentForm({ postId }) {
                 },
                 body: JSON.stringify({
                     ...formData,
-                    date: format(formData.date, 'yyyy-MM-dd'),
-                    serviceType: postId,
-                    user: user._id,
+                    date: format(formData.date, 'yyyy-MM-dd HH:mm'), // Invia data e ora nel formato corretto
+                    serviceType: postId // Invia l'ID del servizio (postId)
                 }),
             });
-            console.log(formData);
-
+            console.log(formData)
             if (response.ok) {
                 setAlertMessage('Appuntamento creato con successo!');
                 setAlertVariant('success');
                 setShowAlert(true);
                 setFormData({
-                    ...formData,
-                    serviceType: postId,
-                    user: user ? user._id : null, // Reimposta l'ID utente se disponibile
+                    date: new Date(), // Resetta i campi del form
+                    notes: '',
                 });
             } else {
                 const errorData = await response.json();
-                setAlertMessage(`Errore durante la creazione dell'appuntamento: ${errorData.message || response.statusText}`);
+                setAlertMessage(`Errore: ${errorData.message || response.statusText}`);
                 setShowAlert(true);
             }
         } catch (error) {
@@ -91,6 +72,7 @@ function AppointmentForm({ postId }) {
             setShowAlert(true);
         }
     };
+
 
     return (
         <>
