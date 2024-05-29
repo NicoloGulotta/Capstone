@@ -148,34 +148,38 @@ authRouter.put('/settings', authMiddleware, async (req, res, next) => {
         next(error);
     }
 });
+authRouter.get('/googlelogin',
+    passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-authRouter.get('/googlelogin', (req, res, next) => {
-    // Imposta le intestazioni CORS prima di avviare l'autenticazione
-    res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
-    // Quindi, procedi con l'autenticazione
-    passport.authenticate("google", {
-        scope: ["profile", "email"],
-        callbackURL: process.env.G_CALLBACK_URL
-    })(req, res, next); // Chiama il middleware con req, res, next
-});
 
 authRouter.get('/callback',
-    passport.authenticate("google", { session: false }), (req, res, next) => {
+    passport.authenticate('google', { failureRedirect: '/login' }),
+    async (req, res, next) => {
         try {
-            if (!req.user || !req.user.accessToken) {
-                return next(createError(401, 'Authentication failed'));
+            if (!req.user) {
+                return res.redirect('/login');
             }
-            console.log(req);
-            console.log(req.user.accessToken);
-            // localStorage.setItem("token", req.user.accessToken);
-            //  localStorage.setItem("user", JSON.stringify(req.user));
-            res.redirect(`${process.env.FRONTEND_URL}?accessToken=${req.user.accessToken}`);
+
+            // Genera il token JWT dopo l'autenticazione
+            const token = generateJWT({ _id: req.user._id });
+            res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'strict' });
+
+            const populatedUser = await User.findById(req.user._id)
+                .select('-password') // Escludi il campo password
+                .populate({
+                    path: "appointments",
+                    populate: {
+                        path: "serviceType",
+                        model: "Post",
+                    },
+                });
+
+            // Invia i dati dell'utente come JSON (includi il token)
+            res.json({ user: populatedUser, token });
         } catch (error) {
             next(error);
         }
     });
+
 
 export default authRouter;

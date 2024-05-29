@@ -10,6 +10,7 @@ export const AuthContext = createContext({
     error: null,
     setError: () => { },
     updateUser: (updatedUserData) => { },
+    updateToken: (newToken) => { },
 });
 
 export const AuthProvider = ({ children }) => {
@@ -17,6 +18,9 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [token, setToken] = useState(null); // Stato separato per il token
     const [error, setError] = useState(null);
+    const updateToken = (newToken) => {
+        setToken(newToken);
+    };
     const navigate = useNavigate();
 
     // Verifica e imposta l'autenticazione all'avvio
@@ -65,6 +69,7 @@ export const AuthProvider = ({ children }) => {
             error,
             setError,
             updateUser,
+            updateToken
         }}>
             {children}
         </AuthContext.Provider>
