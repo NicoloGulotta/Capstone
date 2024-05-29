@@ -161,7 +161,7 @@ appointmentRouter.delete('/:id', authMiddleware, async (req, res, next) => {
             return res.status(400).json({ message: 'ID appuntamento non valido.' });
         }
 
-        const deletedAppointment = await Appointment.findByIdAndRemove(appointmentId);
+        const deletedAppointment = await Appointment.findByIdAndDelete(appointmentId);
         if (!deletedAppointment) {
             return res.status(404).json({ message: 'Appuntamento non trovato.' });
         }

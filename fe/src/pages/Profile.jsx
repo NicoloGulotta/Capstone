@@ -6,45 +6,44 @@ import { format } from "date-fns";
 import it from "date-fns/locale/it";
 
 function Profile() {
-    const { isAuthenticated } = useContext(AuthContext);
+    const { isAuthenticated, token: contextToken } = useContext(AuthContext);
     const [profileData, setProfileData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [token, setToken] = useState(contextToken);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!isAuthenticated) {
+            navigate("/");
+        }
+    }, [isAuthenticated, navigate]);
+
+    // Verifica la presenza del token nel localStorage
+    useEffect(() => {
+        const storedToken = localStorage.getItem("token");
+        if (storedToken) {
+            setToken(storedToken);
+        }
+    }, []);
 
     useEffect(() => {
         const fetchProfileData = async () => {
             setIsLoading(true);
             try {
-                if (isAuthenticated) {
+                if (token) {
                     const response = await fetch("http://localhost:3001/auth/profile", {
                         headers: {
-                            Authorization: `Bearer ${localStorage.getItem("token")}`,
+                            Authorization: `Bearer ${token}`,
                         },
                     });
 
                     if (response.ok) {
                         const data = await response.json();
-
-                        // Se ci sono appuntamenti, recupera i dettagli
-                        if (data.appointments && data.appointments.length > 0) {
-                            const appointmentDetailsPromises = data.appointments.map(async (appointmentId) => {
-                                const res = await fetch(`http://localhost:3001/appointment/${appointmentId}`, {
-                                    headers: {
-                                        Authorization: `Bearer ${localStorage.getItem("token")}`,
-                                    },
-                                });
-                                return res.json();
-
-                            });
-
-                            const appointmentDetails = await Promise.all(appointmentDetailsPromises);
-                            setProfileData({ ...data, appointments: appointmentDetails });
-                            console.log(appointmentDetails);
-                        } else {
-                            // Se non ci sono appuntamenti, imposta profileData direttamente
-                            setProfileData(data);
-                        }
+                        setProfileData(data); // Imposta direttamente i dati del profilo con gli appuntamenti già popolati
+                        // data.appointments.forEach(appointment => {
+                        //     console.log(appointment.serviceType);
+                        // })
                     } else {
                         setError("Errore nel recupero dei dati del profilo.");
                     }
@@ -57,11 +56,10 @@ function Profile() {
         };
 
         fetchProfileData();
-    }, [isAuthenticated]);
+    }, [token]);
 
     const handleCancelAppointment = async (appointmentId) => {
         try {
-            const token = localStorage.getItem('token');
             const response = await fetch(`http://localhost:3001/appointment/${appointmentId}`, {
                 method: 'DELETE',
                 headers: {
@@ -70,6 +68,7 @@ function Profile() {
             });
 
             if (response.ok) {
+                // Aggiorna lo stato locale rimuovendo l'appuntamento cancellato
                 setProfileData(prevData => ({
                     ...prevData,
                     appointments: prevData.appointments.filter(app => app._id !== appointmentId)
@@ -82,15 +81,12 @@ function Profile() {
             setError("Errore imprevisto: " + error.message);
         }
     };
-
     return (
         <div className="container mt-5">
             {error && <Alert variant="danger">{error}</Alert>}
             {isLoading ? (
                 <div className="text-center">
-                    <Spinner animation="border" role="status">
-                        <span className="visually-hidden">Caricamento...</span>
-                    </Spinner>
+                    {/* ... spinner ... */}
                 </div>
             ) : profileData ? (
                 <div>
@@ -99,24 +95,18 @@ function Profile() {
 
                     <section className="mt-4">
                         <h2>I miei appuntamenti</h2>
-                        {profileData.appointments?.length === 0 ? (
+                        {profileData.appointments.length === 0 ? (
                             <p>Non hai ancora prenotato nessun appuntamento.</p>
                         ) : (
                             <Table striped bordered hover responsive>
                                 <thead>
-                                    <tr>
-                                        <th key="service">Servizio</th>
-                                        <th key="date">Data e Ora</th>
-                                        <th key="notes">Note</th>
-                                        <th key="status">Stato</th>
-                                        <th key="actions">Azioni</th>
-                                    </tr>
+                                    {/* ... intestazione della tabella ... */}
                                 </thead>
                                 <tbody>
-                                    {profileData.appointments?.map((appointment) => (
+                                    {profileData.appointments.map((appointment) => (
                                         <tr key={appointment._id}>
-                                            <td>{appointment.serviceType || "Servizio non disponibile"}</td>
-                                            <td>{appointment.date ? format(new Date(appointment.date), 'dd/MM/yyyy HH:mm', { locale: it }) : "Data non disponibile"}</td>
+                                            <td>{appointment.serviceType.title}</td>
+                                            <td>{format(new Date(appointment.date), 'dd/MM/yyyy HH:mm', { locale: it })}</td>
                                             <td>{appointment.notes || "Nessuna nota"}</td>
                                             <td>{appointment.status}</td>
                                             <td>
@@ -129,17 +119,10 @@ function Profile() {
                                 </tbody>
                             </Table>
                         )}
-                        <Link to="/services">
-                            <Button variant="primary">Prenota un nuovo appuntamento</Button>
-                        </Link>
+                        {/* ... pulsante per prenotare ... */}
                     </section>
                 </div>
-            ) : (
-                <>
-                    <Alert variant="warning">Stai per uscire da ScisorHand</Alert>
-                    {navigate("/")}
-                </>
-            )}
+            ) : null}
         </div>
     );
 }

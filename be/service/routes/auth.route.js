@@ -78,8 +78,14 @@ authRouter.post("/login", async (req, res, next) => {
 
 authRouter.get("/profile", authMiddleware, async (req, res, next) => {
     try {
-        const user = await User.findById(req.user._id).select("name surname email comments role appointments "); // Proietta solo i campi necessari
-
+        const user = await User.findById(req.user._id)
+            .select("name surname email comments role appointments")
+            .populate({
+                path: "appointments",
+                populate: {
+                    path: "serviceType",
+                }
+            });
         if (!user) {
             return res.status(404).json({ message: "Utente non trovato" }); // Errore 404 se l'utente non esiste
         }
@@ -102,7 +108,46 @@ authRouter.get("/check-admin", authMiddleware, async (req, res, next) => {
         next(error);
     }
 });
+authRouter.put('/settings', authMiddleware, async (req, res, next) => {
+    try {
+        const userId = req.user._id;
+        const { name, surname, email, password } = req.body; // Includi anche la password se vuoi permetterne la modifica
 
+        // 1. Validazione dell'input
+        if (!name || !surname || !email) {
+            return next(createError(400, 'Nome, cognome ed email sono obbligatori.'));
+        }
+
+        // 2. Validazione della password (se fornita)
+        let hashedPassword = null;
+        if (password) {
+            if (password.length < 8) {
+                return next(createError(400, 'La password deve essere di almeno 8 caratteri.'));
+            }
+            hashedPassword = await bcrypt.hash(password, 10); // Assumi che bcrypt sia importato
+        }
+
+        // 3. Aggiornamento dell'utente nel database
+        const updateData = { name, surname, email };
+        if (hashedPassword) {
+            updateData.password = hashedPassword; // Aggiorna la password solo se è stata fornita
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true });
+
+        if (!updatedUser) {
+            return next(createError(404, "Utente non trovato"));
+        }
+
+        // 4. Risposta al client
+        // Rimuovi il campo password dalla risposta per sicurezza
+        const userWithoutPassword = updatedUser.toObject();
+        delete userWithoutPassword.password;
+        res.json(userWithoutPassword);
+    } catch (error) {
+        next(error);
+    }
+});
 
 authRouter.get('/googlelogin', (req, res, next) => {
     // Imposta le intestazioni CORS prima di avviare l'autenticazione

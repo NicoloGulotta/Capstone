@@ -10,6 +10,7 @@ import Home from "./pages/Home";
 import PostDetails from "./pages/PostDetails";
 import Login from "./components/commons/Login";
 import RegistrationForm from "./components/commons/Registration";
+import Settings from "./pages/Settings";
 
 // Importazione dei componenti di layout
 import Navbar from "./components/layout/Navbar";
@@ -56,6 +57,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/settings" element={<Settings />} />
               <Route path="/registrazione" element={<RegistrationForm />} />
               {/* <Route
                 path="/create-post"
