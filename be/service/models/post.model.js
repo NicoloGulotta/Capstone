@@ -3,7 +3,7 @@ import { Schema, model } from "mongoose";
 const postSchema = new Schema(
     {
         title: {
-            type: String,    // Use 'String' instead of 'string' (Mongoose convention)
+            type: String,
             required: true
         },
         cover: {
@@ -14,7 +14,7 @@ const postSchema = new Schema(
             type: String,
             required: true
         },
-        author: {
+        user: {
             type: Schema.Types.ObjectId,
             ref: 'User',
             required: true

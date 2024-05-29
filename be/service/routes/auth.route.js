@@ -56,8 +56,8 @@ authRouter.post("/login", async (req, res, next) => {
                 .populate({
                     path: "appointments",
                     populate: {
-                        path: "comments",
-                        model: "Comment",
+                        path: "serviceType",
+                        model: "Post",
                     },
                 });
 

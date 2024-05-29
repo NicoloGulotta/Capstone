@@ -14,7 +14,7 @@ const postRouter = Router();
 // GET /posts: Ottieni tutti i post
 postRouter.get('/', async (req, res, next) => {
     try {
-        const posts = await Post.find().populate(["author", "comments"]);
+        const posts = await Post.find().populate(["user", "comments"]);
         res.send(posts);
     } catch (error) {
         next(error);
@@ -28,7 +28,7 @@ postRouter.get('/:postId', async (req, res, next) => {
             return next(createError(400, "ID Post non valido"));
         }
 
-        const post = await Post.findById(req.params.postId).populate(["author", "comments"]);
+        const post = await Post.findById(req.params.postId).populate(["user", "comments"]);
         if (!post) {
             return next(createError(404, "Post non trovato"));
         }
@@ -84,7 +84,7 @@ postRouter.post('/posts', authMiddleware, postCover, async (req, res, next) => {
             return next(createError(400, "Titolo e contenuto sono obbligatori"));
         }
 
-        const post = await Post.create({ ...data, author: userId, cover }); // Usa la variabile cover
+        const post = await Post.create({ ...data, user: userId, cover }); // Usa la variabile cover
         res.status(201).send(post);
     } catch (error) {
         if (error.name === 'ValidationError') {

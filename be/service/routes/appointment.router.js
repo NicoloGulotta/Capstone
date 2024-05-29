@@ -1,33 +1,46 @@
 import { Router } from 'express';
 import Appointment from '../models/appointment.model.js';
 import { authMiddleware } from '../auth/auth.js';
-import createError from 'http-errors';
 import mongoose from 'mongoose';
+import User from '../models/user.model.js';
+
 const appointmentRouter = Router();
+
 // GET /appointments: Ottieni tutti gli appuntamenti dell'utente autenticato
 appointmentRouter.get('/', authMiddleware, async (req, res, next) => {
     try {
         const userId = req.user._id;
-        const appointments = await Appointment.find({ user: userId }).populate('user'); // Popola l'utente associato
+        const appointments = await Appointment.find({ user: userId })
+            .populate('user', 'name email')
+            .populate('serviceType', 'name price duration')
+            .sort({ date: 1 });
         res.json(appointments);
     } catch (error) {
         next(error);
     }
 });
-// GET /appointments/:id: Ottieni un singolo appuntamento
+
+// GET /appointments/:id: Ottieni un singolo appuntamento (dettagliato)
 appointmentRouter.get('/:id', authMiddleware, async (req, res, next) => {
     try {
         const appointmentId = req.params.id;
 
-        // Verifica se appointmentId è un ObjectId valido
         if (!mongoose.Types.ObjectId.isValid(appointmentId)) {
             return res.status(400).json({ message: 'ID appuntamento non valido.' });
         }
 
-        const appointment = await Appointment.findById(appointmentId);
+        const appointment = await Appointment.findById(appointmentId)
+            .populate('user', 'name email')
+            .populate('serviceType', 'name price duration');
+
         if (!appointment) {
             return res.status(404).json({ message: 'Appuntamento non trovato.' });
         }
+
+        // // Verifica che l'utente sia autorizzato
+        // if (appointment.user.toString() !== req.user._id.toString()) {
+        //     return res.status(403).json({ message: 'Non sei autorizzato a visualizzare questo appuntamento.' });
+        // }
 
         res.json(appointment);
     } catch (error) {
@@ -39,14 +52,13 @@ appointmentRouter.get('/:id', authMiddleware, async (req, res, next) => {
 appointmentRouter.post('/', authMiddleware, async (req, res, next) => {
     try {
         const { serviceType, date, notes } = req.body;
-        const userId = req.user._id; // Ottieni l'ID utente dall'autenticazione
+        const userId = req.user._id;
 
-        // 1. Validazione dell'input (puoi aggiungere ulteriori controlli se necessario)
+        // Validazione dell'input
         if (!serviceType || !date) {
             return res.status(400).json({ message: 'Parametri mancanti: serviceType, date.' });
         }
 
-        // Verifica ObjectId e data
         if (!mongoose.Types.ObjectId.isValid(serviceType)) {
             return res.status(400).json({ message: 'serviceType non è un ObjectId valido.' });
         }
@@ -54,68 +66,97 @@ appointmentRouter.post('/', authMiddleware, async (req, res, next) => {
             return res.status(400).json({ message: 'Formato data non valido.' });
         }
 
-
-        // 2. Creazione dell'appuntamento
+        // Creazione dell'appuntamento
         const newAppointment = new Appointment({
-            serviceType,
-            date,
-            user: userId,
-            notes,
+            ...req.body,
+            user: req.user._id,
             status: 'In attesa',
         });
 
         const savedAppointment = await newAppointment.save();
 
-        // 3. Aggiorna l'utente con il nuovo appuntamento
+        // Aggiorna l'utente con il nuovo appuntamento
         await User.findByIdAndUpdate(userId, { $push: { appointments: savedAppointment._id } });
 
-        // 4. Risposta di successo:
-        res.status(201).json(savedAppointment);
+        // Risposta di successo: restituisci l'appuntamento completo con i dati popolati
+        const populatedAppointment = await Appointment.findById(savedAppointment._id)
+            .populate('serviceType', 'name price duration');
+        res.status(201).json(populatedAppointment);
     } catch (error) {
-        // 5. Gestione degli errori
         if (error.name === 'ValidationError') {
             return res.status(400).json({ message: error.message });
         } else if (error.name === 'CastError' && error.kind === 'ObjectId') {
             return res.status(400).json({ message: 'ID utente o ID servizio non valido.' });
         }
-        next(error); // Passa altri errori al middleware successivo
-    }
-});
-
-// PUT /appointments/:appointmentId: Aggiorna un appuntamento esistente
-appointmentRouter.put('/:id', authMiddleware, async (req, res, next) => {
-    try {
-        const appointmentId = req.params.id;
-        const { date, notes, status } = req.body; // Aggiorna solo i campi consentiti
-
-        // Verifica se appointmentId è un ObjectId valido
-        if (!mongoose.Types.ObjectId.isValid(appointmentId)) {
-            return res.status(400).json({ message: 'ID appuntamento non valido.' });
-        }
-
-        const appointment = await Appointment.findByIdAndUpdate(
-            appointmentId,
-            { date, notes, status },
-            { new: true } // Restituisci il documento aggiornato
-        );
-
-        if (!appointment) {
-            return res.status(404).json({ message: 'Appuntamento non trovato.' });
-        }
-
-        res.json(appointment);
-    } catch (error) {
         next(error);
     }
 });
 
+// PUT /appointments/:id: Aggiorna un appuntamento esistente
+appointmentRouter.put('/:id', authMiddleware, async (req, res, next) => {
+    try {
+        const appointmentId = req.params.id;
+        const { date, notes, status, serviceType } = req.body;
 
-// DELETE /appointments/:appointmentId: Elimina un appuntamento
+        // 1. Validazione dell'ID dell'appuntamento
+        if (!mongoose.Types.ObjectId.isValid(appointmentId)) {
+            return res.status(400).json({ message: 'ID appuntamento non valido.' });
+        }
+
+        // 2. Recupero dell'appuntamento
+        const appointment = await Appointment.findById(appointmentId);
+        if (!appointment) {
+            return res.status(404).json({ message: 'Appuntamento non trovato.' });
+        }
+
+        // 3. Verifica dell'autorizzazione
+        if (appointment.user.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: 'Non sei autorizzato a modificare questo appuntamento.' });
+        }
+
+        // 4. Validazione del serviceType (se fornito)
+        if (serviceType) {
+            if (!mongoose.Types.ObjectId.isValid(serviceType)) {
+                return res.status(400).json({ message: 'ID serviceType non valido.' });
+            }
+
+            // Verifica l'esistenza del serviceType nel database
+            const existingServiceType = await ServiceType.findById(serviceType);
+            if (!existingServiceType) {
+                return res.status(404).json({ message: 'Tipo di servizio non trovato.' });
+            }
+        }
+
+        // 5. Aggiornamento dei campi dell'appuntamento
+        appointment.date = date || appointment.date;
+        appointment.notes = notes || appointment.notes;
+        appointment.status = status || appointment.status;
+        if (serviceType) {
+            appointment.serviceType = serviceType;
+        }
+
+        // 6. Salvataggio dell'appuntamento aggiornato
+        const updatedAppointment = await appointment.save();
+
+        // 7. Popolamento dei campi (opzionale)
+        await updatedAppointment
+            .populate('user', 'name email')
+            .populate('serviceType', 'name price duration')
+            .execPopulate();
+
+        // 8. Risposta al client
+        res.json(updatedAppointment);
+    } catch (error) {
+        next(error); // Gestione degli errori centralizzata
+    }
+});
+
+
+// DELETE /appointments/:id: Elimina un appuntamento
 appointmentRouter.delete('/:id', authMiddleware, async (req, res, next) => {
     try {
         const appointmentId = req.params.id;
 
-        // Verifica se appointmentId è un ObjectId valido
         if (!mongoose.Types.ObjectId.isValid(appointmentId)) {
             return res.status(400).json({ message: 'ID appuntamento non valido.' });
         }
@@ -125,11 +166,15 @@ appointmentRouter.delete('/:id', authMiddleware, async (req, res, next) => {
             return res.status(404).json({ message: 'Appuntamento non trovato.' });
         }
 
+        // Verifica che l'utente sia autorizzato
+        if (deletedAppointment.user.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: 'Non sei autorizzato a eliminare questo appuntamento.' });
+        }
+
         res.json({ message: 'Appuntamento eliminato con successo.' });
     } catch (error) {
         next(error);
     }
 });
-
 
 export default appointmentRouter;

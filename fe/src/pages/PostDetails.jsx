@@ -20,8 +20,8 @@ function PostDetails() {
                 }
                 const data = await response.json();
                 setPost(data);
-                console.log(data);
-                console.log(postId);
+                // console.log(data);
+                // console.log(postId);
             } catch (error) {
                 console.error("Error loading post:", error);
                 setError(error.message);
@@ -34,7 +34,7 @@ function PostDetails() {
     }, [postId]);
     // Log post dopo che è stato aggiornato
     useEffect(() => {
-        console.log(post);
+        // console.log(post);
     }, [post]);
     // Enhanced Conditional Rendering
     if (isLoading) {

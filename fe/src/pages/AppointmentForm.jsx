@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { parse, format } from 'date-fns';
 import it from 'date-fns/locale/it';
-import { AuthContext } from '../context/AuthContext';
+// import { AuthContext } from '../context/AuthContext';
 
 function AppointmentForm({ postId }) {
-    const { user } = useContext(AuthContext);
+    // const { user } = useContext(AuthContext);
     const minTime = parse("09:00", "HH:mm", new Date());
     const maxTime = parse("20:00", "HH:mm", new Date());
 
