@@ -59,15 +59,17 @@ function Servizi() {
         ) : (
           <>
             <h2>I Nostri Servizi</h2>
-            <Row >
+            <Row>
               {servizi.map((servizio) => (
-                <Col key={servizio._id} md={6} lg={4} className="mb-4" itemID='servizi'>
-                  <Card style={{ height: '100%' }} >
+                <Col key={servizio._id} xs={12} sm={6} md={3} lg={4} className="mb-4"> {/* Colonne più strette */}
+                  <Card className="card-sm"> {/* Classe per card piccole */}
                     <Card.Img variant="top" src={servizio.cover} alt={servizio.title} />
                     <Card.Body>
                       <Card.Title>{servizio.title}</Card.Title>
-                      <Card.Text>{servizio.content}</Card.Text>
-                      <Button variant="primary" onClick={() => navigate(`post/${servizio._id}`)}>
+                      <Button
+                        variant="primary"
+                        onClick={() => navigate(`post/${servizio._id}`)}
+                      >
                         Prenota
                       </Button>
                     </Card.Body>
@@ -75,6 +77,7 @@ function Servizi() {
                 </Col>
               ))}
             </Row>
+
           </>
         )}
       </Container>

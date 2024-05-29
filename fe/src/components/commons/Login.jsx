@@ -78,10 +78,10 @@ function Login() {
                         onChange={handleChange}
                     />
                 </Form.Group>
-                <Button variant="primary" type="submit">
+                <Button variant="dark" type="submit">
                     Login
                 </Button>
-                <GoogleAuth />
+                {/* <GoogleAuth /> */}
             </Form>
         </div>
     );

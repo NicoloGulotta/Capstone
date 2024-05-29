@@ -22,11 +22,11 @@ function MyNavbar({ onLogout }) {
                         Home
                     </Nav.Link>
                         {/* Mostra il link "Crea Post" solo se l'utente è autenticato */}
-                        {isAuthenticated && (
+                        {/* {isAuthenticated && (
                             <Nav.Link as={Link} to="/create-post">
                                 Crea Post
                             </Nav.Link>
-                        )}
+                        )} */}
                         <Button variant="outline-light" onClick={handleShow}>
                             Contattaci
                         </Button>
