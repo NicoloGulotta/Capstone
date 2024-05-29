@@ -10,7 +10,6 @@ export const AuthContext = createContext({
     error: null,
     setError: () => { },
     updateUser: (updatedUserData) => { },
-    updateToken: (newToken) => { },
 });
 
 export const AuthProvider = ({ children }) => {
@@ -20,7 +19,7 @@ export const AuthProvider = ({ children }) => {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    // Funzione per gestire il login
+    // Login Function
     const login = (userData) => {
         setIsAuthenticated(true);
         setUser(userData.user);
@@ -29,31 +28,30 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem("user", JSON.stringify(userData.user));
     };
 
-
-
-    // Verifica e imposta l'autenticazione all'avvio
+    // Check Authentication on App Load
     useEffect(() => {
-        async function checkAuthentication() {
+        const storedUser = localStorage.getItem("user");
+
+        // Check if storedUser is valid JSON
+        if (storedUser && storedUser !== 'undefined') {
             try {
-                const response = await fetch("http://localhost:3001/auth/profile", {
-                    method: "GET",
-                    credentials: "include", // Importante per inviare i cookie
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    login(data);
+                const parsedUser = JSON.parse(storedUser);
+                if (parsedUser && parsedUser.token) {
+                    setIsAuthenticated(true);
+                    setUser(parsedUser);
+                    setToken(parsedUser.token);
                 }
-            } catch (error) {
-                console.error("Errore durante la verifica dell'autenticazione:", error);
+            } catch (e) {
+                // Handle JSON parsing errors
+                console.error('Errore nel parsing di JSON:', e);
             }
+        } else {
+            // Handle the case where the "user" data is not present or not JSON
+            console.log("Dati utente non presenti o non validi in localStorage");
         }
-
-        checkAuthentication();
     }, []);
 
-
-    // Funzione per gestire il logout
+    // Logout Function
     const logout = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
@@ -63,18 +61,10 @@ export const AuthProvider = ({ children }) => {
         navigate("/");
     };
 
-    // Funzione per aggiornare i dati dell'utente
+    // Update User Data Function
     const updateUser = (updatedUserData) => {
-        setUser((prevUser) => ({ ...prevUser, ...updatedUserData }));
-        localStorage.setItem(
-            "user",
-            JSON.stringify({ ...user, ...updatedUserData })
-        );
-    };
-
-    // Funzione per aggiornare il token
-    const updateToken = (newToken) => {
-        setToken(newToken);
+        setUser(prevUser => ({ ...prevUser, ...updatedUserData }));
+        localStorage.setItem("user", JSON.stringify({ ...user, ...updatedUserData }));
     };
 
     return (
@@ -88,7 +78,6 @@ export const AuthProvider = ({ children }) => {
                 error,
                 setError,
                 updateUser,
-                updateToken,
             }}
         >
             {children}

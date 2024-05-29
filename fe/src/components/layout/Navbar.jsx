@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { Container, Navbar, Nav, Image, Dropdown, Button, Modal } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { AuthContext } from "../../context/AuthContext";
+import { AuthContext } from "../../context/AuthContext"; // Assicurati che il percorso sia corretto
 
 function MyNavbar({ onLogout }) {
     const { isAuthenticated, user } = useContext(AuthContext);
@@ -9,31 +9,25 @@ function MyNavbar({ onLogout }) {
 
     const handleClose = () => setShowModal(false);
     const handleShow = () => setShowModal(true);
+
     return (
-        <Navbar bg="dark" expand="lg" className="mb-3 navbar-dark">
+        <Navbar bg="dark" variant="dark" expand="lg" className="mb-3">
             <Container>
-                {/* Brand/Logo */}
                 <Navbar.Brand as={Link} to="/">
                     ScissorHand
                 </Navbar.Brand>
-
-                {/* Hamburger Menu (per schermi più piccoli) */}
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
-
-                {/* Contenuto Collassabile */}
                 <Navbar.Collapse id="basic-navbar-nav">
-                    {/* Link di Navigazione Allineati a Sinistra */}
-                    <Nav className="me-auto">
-                        <Nav.Link as={Link} to="/">
-                            Home
-                        </Nav.Link>
+                    <Nav className="me-auto"><Nav.Link as={Link} to="/">
+                        Home
+                    </Nav.Link>
                         {/* Mostra il link "Crea Post" solo se l'utente è autenticato */}
-                        {/* {isAuthenticated && (
+                        {isAuthenticated && (
                             <Nav.Link as={Link} to="/create-post">
                                 Crea Post
                             </Nav.Link>
-                        )} */}
-                        <Button variant="outline-primary" onClick={handleShow}>
+                        )}
+                        <Button variant="outline-light" onClick={handleShow}>
                             Contattaci
                         </Button>
 
@@ -43,7 +37,8 @@ function MyNavbar({ onLogout }) {
                             </Modal.Header>
                             <Modal.Body>
                                 <p>
-                                    Puoi contattarci al numero di telefono 123-456-7890 o all'indirizzo email info@hairsalon.com.
+                                    Puoi contattarci al numero di telefono 123-456-7890 o
+                                    all'indirizzo email info@hairsalon.com.
                                 </p>
                             </Modal.Body>
                             <Modal.Footer>
@@ -52,21 +47,14 @@ function MyNavbar({ onLogout }) {
                                 </Button>
                             </Modal.Footer>
                         </Modal>
-
                     </Nav>
 
                     <Nav>
-                        {/* Mostra il dropdown dell'utente se autenticato, altrimenti mostra login/registrazione */}
                         {isAuthenticated ? (
                             <Dropdown align="end">
-                                <Dropdown.Toggle
-                                    variant="link"
-                                    id="dropdown-user"
-                                    className="d-flex align-items-center"
-                                >
-                                    {/* Usa l'avatar dell'utente se disponibile, altrimenti un'immagine predefinita */}
+                                <Dropdown.Toggle variant="link" id="dropdown-user" className="text-light d-flex align-items-center">
                                     <Image
-                                        src={user?.avatar || "https://gravatar.com/avatar/003e729c32d55ae84cccd73f015a7276?s=400&d=robohash&r=x"}
+                                        src={user?.avatar || "https://via.placeholder.com/150"}
                                         roundedCircle
                                         width="30"
                                         height="30"
@@ -75,7 +63,7 @@ function MyNavbar({ onLogout }) {
                                     <span className="ms-2">{user?.name}</span>
                                 </Dropdown.Toggle>
 
-                                <Dropdown.Menu>
+                                <Dropdown.Menu variant="dark">
                                     {user && (
                                         <Dropdown.Item as={Link} to={`/profile`}>
                                             Profilo
@@ -87,14 +75,13 @@ function MyNavbar({ onLogout }) {
                                     <Dropdown.Divider />
                                     <Dropdown.Item onClick={onLogout}>Logout</Dropdown.Item>
                                 </Dropdown.Menu>
-
                             </Dropdown>
                         ) : (
                             <>
-                                <Nav.Link as={Link} to="/login">
+                                <Nav.Link as={Link} to="/login" className="text-light">
                                     Login
                                 </Nav.Link>
-                                <Nav.Link as={Link} to="/registrazione">
+                                <Nav.Link as={Link} to="/registrazione" className="text-light">
                                     Registrazione
                                 </Nav.Link>
                             </>
@@ -102,7 +89,7 @@ function MyNavbar({ onLogout }) {
                     </Nav>
                 </Navbar.Collapse>
             </Container>
-        </Navbar >
+        </Navbar>
     );
 }
 

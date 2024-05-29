@@ -4,26 +4,27 @@ import { Container, Card, Spinner, Alert } from "react-bootstrap";
 import AppointmentForm from "./AppointmentForm";
 import { AuthContext } from "../context/AuthContext";
 import './../styles/PostDetails.css';
+
 function PostDetails() {
     const { postId } = useParams();
     const [post, setPost] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-    const { user } = useContext(AuthContext);
+    const { user, isAuthenticated } = useContext(AuthContext);
 
     useEffect(() => {
         const fetchData = async () => {
+            setIsLoading(true);
+
             try {
                 const response = await fetch(`http://localhost:3001/post/${postId}`);
                 if (!response.ok) {
-                    throw new Error("Post not found");
+                    throw new Error("Post non trovato");
                 }
                 const data = await response.json();
                 setPost(data);
-                // console.log(data);
-                // console.log(postId);
             } catch (error) {
-                console.error("Error loading post:", error);
+                console.error("Errore durante il caricamento del post:", error);
                 setError(error.message);
             } finally {
                 setIsLoading(false);
@@ -32,40 +33,44 @@ function PostDetails() {
 
         fetchData();
     }, [postId]);
-    // Log post dopo che è stato aggiornato
-    useEffect(() => {
-        // console.log(post);
-    }, [post]);
-    // Enhanced Conditional Rendering
+
+    // Rendering condizionale migliorato
     if (isLoading) {
-        return <Spinner animation="border" role="status" />;
+        return (
+            <Container className="mt-5 text-center">
+                <Spinner animation="border" role="status" />
+            </Container>
+        );
     }
 
     if (error) {
-        return <Alert variant="danger">{error}</Alert>;
+        return (
+            <Container className="mt-5">
+                <Alert variant="danger">{error}</Alert>
+            </Container>
+        );
     }
 
-    // Check both post and user before accessing user._id
-    if (!post || !user || !user.user) {
-        return <Alert variant="warning">Effettua la registrazione o accedi per vedere i dettagli</Alert>;
+    // Controllo più specifico sull'utente e sull'autenticazione
+    if (!isAuthenticated || !user || !user._id) {
+        return (
+            <Container className="mt-5">
+                <Alert variant="warning">Effettua la registrazione o accedi per vedere i dettagli</Alert>
+            </Container>
+        );
     }
-    console.log(post, user.user._id);
+
     return (
-        <Container>
+        <Container className="mt-5">
             <Card className="card-details">
-                <Card.Img
-                    variant="top"
-                    src={post.cover}
-                    alt={post.title}
-                    className="card-img-top" />
+                <Card.Img variant="top" src={post.cover} alt={post.title} className="card-img-top" />
                 <Card.Body>
                     <Card.Title>{post.title}</Card.Title>
                     <Card.Text>{post.content}</Card.Text>
                 </Card.Body>
             </Card>
 
-            {/* Pass userId safely */}
-            <AppointmentForm postId={postId} userId={user.user._id} />
+            <AppointmentForm postId={postId} userId={user._id} />
         </Container>
     );
 }

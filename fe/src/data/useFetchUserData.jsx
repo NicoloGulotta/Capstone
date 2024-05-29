@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 
 export function useFetchUserData() {
-    const { login, error, setError, isAuthenticated } = useContext(AuthContext);
+    const { login, logout, error, setError, isAuthenticated } = useContext(AuthContext);
     const [isLoading, setIsLoading] = useState(true);
     const [userData, setUserData] = useState(null);
 
@@ -21,23 +21,26 @@ export function useFetchUserData() {
                         const data = await response.json();
                         setUserData(data);
                         login(data);
-                    } else {
+                    } else if (response.status === 401) {
                         setError("Token scaduto o non valido");
+                        logout();
+                    } else {
+                        setError("Errore durante il recupero dei dati utente");
                     }
                 }
             } catch (err) {
-                // Gestisci gli errori di rete
+                setError("Errore di rete");
             } finally {
                 setIsLoading(false);
             }
         };
 
         fetchUserData();
-    }, [login, setError, isAuthenticated]);
+    }, [login, logout, setError, isAuthenticated]);
 
     return {
         isLoading,
-        isLoggedIn: !!userData,
+        isAuthenticated: !!userData,
         userData,
         error,
     };

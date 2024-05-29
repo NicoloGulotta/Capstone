@@ -20,12 +20,7 @@ import Footer from "./components/layout/Footer";
 import { AuthProvider } from "./context/AuthContext";
 import { useFetchUserData } from "./data/useFetchUserData";
 
-// Componente per proteggere le rotte che richiedono autenticazione
-// function PrivateRoute({ children }) {
-//   const { isAuthenticated } = useContext(AuthContext);
-//   return isAuthenticated ? children : <Navigate to="/login" />;
-// }
-
+// Funzione che gestisce l'autenticazione
 function App() {
   const { isLoading, error, } = useFetchUserData();
 
