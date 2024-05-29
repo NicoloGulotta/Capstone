@@ -1,33 +1,32 @@
 import React, { createContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-
-// Creazione del contesto di autenticazione
 export const AuthContext = createContext({
     isAuthenticated: false,
     user: null,
+    token: null,
     login: () => { },
     logout: () => { },
     error: null,
     setError: () => { },
-    isLoggedOut: false, // Aggiunto per gestire il logout
+    updateUser: (updatedUserData) => { },
 });
 
-// Provider del contesto di autenticazione
 export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [user, setUser] = useState(null);
+    const [token, setToken] = useState(null); // Stato separato per il token
     const [error, setError] = useState(null);
-    const [isLoggedOut, setIsLoggedOut] = useState(false); // Stato per gestire il logout
+    const navigate = useNavigate();
 
-    // Verifica se ci sono token e dati utente memorizzati nel localStorage al caricamento
+    // Verifica e imposta l'autenticazione all'avvio
     useEffect(() => {
         const storedToken = localStorage.getItem("token");
         const storedUser = JSON.parse(localStorage.getItem("user"));
-
         if (storedToken && storedUser) {
             setIsAuthenticated(true);
             setUser(storedUser);
+            setToken(storedToken); // Imposta il token
         }
     }, []);
 
@@ -35,35 +34,38 @@ export const AuthProvider = ({ children }) => {
     const login = (userData) => {
         setIsAuthenticated(true);
         setUser(userData);
-        setIsLoggedOut(false);
+        setToken(userData.token); // Imposta il token
         localStorage.setItem("token", userData.token);
         localStorage.setItem("user", JSON.stringify(userData));
     };
 
     // Funzione per gestire il logout
-    const navigate = useNavigate();
-    const logout = (userData) => {
-        localStorage.removeItem("token", userData.token);
+    const logout = () => {
+        localStorage.removeItem("token");
         localStorage.removeItem("user");
         setIsAuthenticated(false);
         setUser(null);
-        setIsLoggedOut(true);
+        setToken(null); // Reimposta il token
         navigate("/");
     };
 
-    // Ritorna il Provider del contesto, rendendo disponibili le funzioni e i dati ai componenti figli
+    // Funzione per aggiornare i dati dell'utente
+    const updateUser = (updatedUserData) => {
+        setUser(prevUser => ({ ...prevUser, ...updatedUserData }));
+        localStorage.setItem("user", JSON.stringify({ ...user, ...updatedUserData }));
+    };
+
     return (
-        <AuthContext.Provider
-            value={{
-                isAuthenticated,
-                user,
-                login,
-                logout,
-                error,
-                setError,
-                isLoggedOut,
-            }}
-        >
+        <AuthContext.Provider value={{
+            isAuthenticated,
+            user,
+            token, // Includi il token nel valore del contesto
+            login,
+            logout,
+            error,
+            setError,
+            updateUser,
+        }}>
             {children}
         </AuthContext.Provider>
     );

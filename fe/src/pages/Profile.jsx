@@ -1,16 +1,15 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { Alert, Table, Button, Spinner } from "react-bootstrap";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import it from "date-fns/locale/it";
 
 function Profile() {
-    const { isAuthenticated, token: contextToken } = useContext(AuthContext);
-    const [profileData, setProfileData] = useState(null);
+    const { isAuthenticated, user, token } = useContext(AuthContext);
+    const [profileData, setProfileData] = useState(user); // Inizializza con i dati dell'utente dal contesto
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [token, setToken] = useState(contextToken);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -18,14 +17,6 @@ function Profile() {
             navigate("/");
         }
     }, [isAuthenticated, navigate]);
-
-    // Verifica la presenza del token nel localStorage
-    useEffect(() => {
-        const storedToken = localStorage.getItem("token");
-        if (storedToken) {
-            setToken(storedToken);
-        }
-    }, []);
 
     useEffect(() => {
         const fetchProfileData = async () => {
@@ -40,10 +31,7 @@ function Profile() {
 
                     if (response.ok) {
                         const data = await response.json();
-                        setProfileData(data); // Imposta direttamente i dati del profilo con gli appuntamenti già popolati
-                        // data.appointments.forEach(appointment => {
-                        //     console.log(appointment.serviceType);
-                        // })
+                        setProfileData(data);
                     } else {
                         setError("Errore nel recupero dei dati del profilo.");
                     }
@@ -55,8 +43,12 @@ function Profile() {
             }
         };
 
-        fetchProfileData();
-    }, [token]);
+        if (!profileData || !profileData.appointments) { // Controlla se profileData e i suoi appuntamenti sono stati caricati
+            fetchProfileData();
+        } else {
+            setIsLoading(false); // Se i dati sono già presenti nel context, non è necessario ricaricarli
+        }
+    }, [token, profileData]);
 
     const handleCancelAppointment = async (appointmentId) => {
         try {
@@ -86,7 +78,9 @@ function Profile() {
             {error && <Alert variant="danger">{error}</Alert>}
             {isLoading ? (
                 <div className="text-center">
-                    {/* ... spinner ... */}
+                    <Spinner animation="border" role="status">
+                        <span className="visually-hidden">Caricamento...</span>
+                    </Spinner>
                 </div>
             ) : profileData ? (
                 <div>
