@@ -34,6 +34,7 @@ const userSchema = new Schema(
         avatar: {
             type: String,
             required: false,
+            default: "https://lh3.googleusercontent.com/a/ACg8ocJZHSdTAcUUmJ1_S2PlZFLGXFz8Wu6pwZ-gGhVJG0m0fZJgO-xu=s96-c",
         },
         password: {
             type: String,

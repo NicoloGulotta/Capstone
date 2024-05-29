@@ -152,7 +152,7 @@ authRouter.get('/googlelogin',
     passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 
-authRouter.get('/callback',
+authRouter.get('/google/callback',
     passport.authenticate('google', { failureRedirect: '/login' }),
     async (req, res, next) => {
         try {
@@ -162,20 +162,12 @@ authRouter.get('/callback',
 
             // Genera il token JWT dopo l'autenticazione
             const token = generateJWT({ _id: req.user._id });
-            res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'strict' });
 
-            const populatedUser = await User.findById(req.user._id)
-                .select('-password') // Escludi il campo password
-                .populate({
-                    path: "appointments",
-                    populate: {
-                        path: "serviceType",
-                        model: "Post",
-                    },
-                });
+            // Imposta il token come cookie (con opzioni appropriate per la sicurezza)
+            res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === "production" });
 
-            // Invia i dati dell'utente come JSON (includi il token)
-            res.json({ user: populatedUser, token });
+            // Esegui il redirect alla pagina desiderata (es: /profile o /)
+            res.redirect(process.env.FRONTEND_URL || 'http://localhost:3000/');
         } catch (error) {
             next(error);
         }

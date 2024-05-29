@@ -7,7 +7,7 @@ import { generateJWT } from "./auth.js";
 const options = {
     clientID: process.env.G_CLIENT_ID,
     clientSecret: process.env.G_CLIENT_SECRET,
-    callbackURL: process.env.G_CALLBACK_URL || "http://localhost:3000/auth/google/callback",
+    callbackURL: process.env.G_CALLBACK_URL,
 };
 
 const googleStrategy = new GoogleStrategy(
@@ -40,10 +40,16 @@ const googleStrategy = new GoogleStrategy(
             const accessToken = generateJWT({ _id: user._id });
 
             console.log("Utente da serializzare:", user);
-            done(null, { user, accessToken });
+            done(null, googleId, user, { accessToken });
         } catch (error) {
             console.error("Errore durante l'autenticazione:", error.message);
-            done(error);
+            if (error.oauthError) {
+                // Errore specifico di OAuth (es. token non valido)
+                return done(null, false, { message: error.oauthError.message });
+            } else {
+                // Altro tipo di errore
+                return done(error);
+            }
         }
     }
 );
