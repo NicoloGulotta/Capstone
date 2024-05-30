@@ -62,10 +62,10 @@ function PostDetails() {
 
     return (
         <Container className="mt-5">
-            <Card className="card-details">
-                <Card.Img variant="top" src={post.cover} alt={post.title} className="card-img-top" />
+            <Card className="mb-2" body style={{ padding: "0.5rem" }} >
+                <Card.Img variant="top" src={post.cover} alt={post.title} style={{ maxHeight: "400px", objectFit: "cover" }} />
                 <Card.Body>
-                    <Card.Title>{post.title}</Card.Title>
+                    <Card.Title style={{ maxHeight: "3em", overflow: "hidden", textOverflow: "ellipsis" }}>{post.title}</Card.Title>
                     <Card.Text>{post.content}</Card.Text>
                 </Card.Body>
             </Card>
