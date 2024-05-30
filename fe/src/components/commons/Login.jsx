@@ -5,9 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 // import GoogleAuth from "../layout/GoogleAuth";
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
-import dotenv from "dotenv";
-import { config } from "../../../../config.js";
-dotenv.config();
+import { config } from "../../context/config.js";
 
 
 function Login() {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 const Footer = () => {
 
@@ -10,16 +10,16 @@ const Footer = () => {
                     <div className="col-md-4">
                         <h4>Informazioni Legali</h4>
                         <ul className="list-unstyled">
-                            <li><a href="#">Privacy</a></li>
-                            <li><a href="#">Cookie Preferences</a></li>
-                            <li><a href="#">Terms of Use</a></li>
+                            <li><a href="/#">Privacy</a></li>
+                            <li><a href="/#">Cookie Preferences</a></li>
+                            <li><a href="/#">Terms of Use</a></li>
                         </ul>
                     </div>
                     <div className="col-md-4">
                         <h4>Assistenza Clienti</h4>
                         <ul className="list-unstyled">
-                            <li><a href="#">Contattaci</a></li>
-                            <li><a href="#">Gift Cards</a></li>
+                            <li><a href="/#">Contattaci</a></li>
+                            <li><a href="/#">Gift Cards</a></li>
                         </ul>
                     </div>
                     <div className="col-md-4">

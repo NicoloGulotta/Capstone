@@ -7,7 +7,7 @@ import it from "date-fns/locale/it";
 
 function Profile() {
     const { isAuthenticated, user, token } = useContext(AuthContext);
-    const [profileData, setProfileData] = useState(user); // Inizializza con i dati dell'utente dal contesto
+    const [profileData, setProfileData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
@@ -43,12 +43,8 @@ function Profile() {
             }
         };
 
-        if (!profileData || !profileData.appointments) { // Controlla se profileData e i suoi appuntamenti sono stati caricati
-            fetchProfileData();
-        } else {
-            setIsLoading(false); // Se i dati sono già presenti nel context, non è necessario ricaricarli
-        }
-    }, [token, profileData]);
+        fetchProfileData();
+    }, [token]);
 
     const handleCancelAppointment = async (appointmentId) => {
         try {
@@ -60,7 +56,6 @@ function Profile() {
             });
 
             if (response.ok) {
-                // Aggiorna lo stato locale rimuovendo l'appuntamento cancellato
                 setProfileData(prevData => ({
                     ...prevData,
                     appointments: prevData.appointments.filter(app => app._id !== appointmentId)
@@ -72,8 +67,7 @@ function Profile() {
         } catch (error) {
             setError("Errore imprevisto: " + error.message);
         }
-    };
-    return (
+    }; return (
         <div className="container mt-5">
             {error && <Alert variant="danger">{error}</Alert>}
             {isLoading ? (
@@ -113,7 +107,9 @@ function Profile() {
                                 </tbody>
                             </Table>
                         )}
-                        {/* ... pulsante per prenotare ... */}
+                        <Button variant="primary" className="mb-3" onClick={() => navigate("/")}>
+                            Prenota un nuovo appuntamento
+                        </Button>
                     </section>
                 </div>
             ) : null}
