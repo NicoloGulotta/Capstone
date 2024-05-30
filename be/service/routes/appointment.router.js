@@ -12,8 +12,7 @@ appointmentRouter.get('/', authMiddleware, async (req, res, next) => {
         const userId = req.user._id;
         const appointments = await Appointment.find({ user: userId })
             .populate('user', 'name email')
-            .populate('serviceType', 'name price duration')
-            .sort({ date: 1 });
+            .sort({ date: 1 }); // Ordina per data
         res.json(appointments);
     } catch (error) {
         next(error);
@@ -30,17 +29,16 @@ appointmentRouter.get('/:id', authMiddleware, async (req, res, next) => {
         }
 
         const appointment = await Appointment.findById(appointmentId)
-            .populate('user', 'name email')
-            .populate('serviceType', 'name price duration');
+            .populate('user', 'name email');
 
         if (!appointment) {
             return res.status(404).json({ message: 'Appuntamento non trovato.' });
         }
 
-        // // Verifica che l'utente sia autorizzato
-        // if (appointment.user.toString() !== req.user._id.toString()) {
-        //     return res.status(403).json({ message: 'Non sei autorizzato a visualizzare questo appuntamento.' });
-        // }
+        // Verifica che l'utente sia autorizzato
+        if (appointment.user.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: 'Non sei autorizzato a visualizzare questo appuntamento.' });
+        }
 
         res.json(appointment);
     } catch (error) {
@@ -51,16 +49,15 @@ appointmentRouter.get('/:id', authMiddleware, async (req, res, next) => {
 // POST /appointments: Crea un nuovo appuntamento
 appointmentRouter.post('/', authMiddleware, async (req, res, next) => {
     try {
-        const { serviceType, date, notes } = req.body;
-        const userId = req.user._id;
+        const { serviceType, date, notes } = req.body; // serviceType è ora una stringa, non un ObjectId
 
         // Validazione dell'input
         if (!serviceType || !date) {
             return res.status(400).json({ message: 'Parametri mancanti: serviceType, date.' });
         }
 
-        if (!mongoose.Types.ObjectId.isValid(serviceType)) {
-            return res.status(400).json({ message: 'serviceType non è un ObjectId valido.' });
+        if (typeof serviceType !== 'string') { // Verifica che serviceType sia una stringa
+            return res.status(400).json({ message: 'serviceType deve essere una stringa.' });
         }
         if (isNaN(Date.parse(date))) {
             return res.status(400).json({ message: 'Formato data non valido.' });
@@ -76,17 +73,12 @@ appointmentRouter.post('/', authMiddleware, async (req, res, next) => {
         const savedAppointment = await newAppointment.save();
 
         // Aggiorna l'utente con il nuovo appuntamento
-        await User.findByIdAndUpdate(userId, { $push: { appointments: savedAppointment._id } });
+        await User.findByIdAndUpdate(req.user._id, { $push: { appointments: savedAppointment._id } });
 
-        // Risposta di successo: restituisci l'appuntamento completo con i dati popolati
-        const populatedAppointment = await Appointment.findById(savedAppointment._id)
-            .populate('serviceType', 'name price duration');
-        res.status(201).json(populatedAppointment);
+        res.status(201).json(savedAppointment); // Invia l'appuntamento appena creato
     } catch (error) {
         if (error.name === 'ValidationError') {
             return res.status(400).json({ message: error.message });
-        } else if (error.name === 'CastError' && error.kind === 'ObjectId') {
-            return res.status(400).json({ message: 'ID utente o ID servizio non valido.' });
         }
         next(error);
     }
@@ -115,16 +107,8 @@ appointmentRouter.put('/:id', authMiddleware, async (req, res, next) => {
         }
 
         // 4. Validazione del serviceType (se fornito)
-        if (serviceType) {
-            if (!mongoose.Types.ObjectId.isValid(serviceType)) {
-                return res.status(400).json({ message: 'ID serviceType non valido.' });
-            }
-
-            // Verifica l'esistenza del serviceType nel database
-            const existingServiceType = await ServiceType.findById(serviceType);
-            if (!existingServiceType) {
-                return res.status(404).json({ message: 'Tipo di servizio non trovato.' });
-            }
+        if (serviceType && typeof serviceType !== 'string') {
+            return res.status(400).json({ message: 'serviceType deve essere una stringa.' });
         }
 
         // 5. Aggiornamento dei campi dell'appuntamento
@@ -132,26 +116,17 @@ appointmentRouter.put('/:id', authMiddleware, async (req, res, next) => {
         appointment.notes = notes || appointment.notes;
         appointment.status = status || appointment.status;
         if (serviceType) {
-            appointment.serviceType = serviceType;
+            appointment.serviceType = serviceType; // serviceType è ora una stringa
         }
 
         // 6. Salvataggio dell'appuntamento aggiornato
         const updatedAppointment = await appointment.save();
+        res.json(updatedAppointment); // Non è necessario ripopolare, abbiamo già tutti i dati
 
-        // 7. Popolamento dei campi (opzionale)
-        await updatedAppointment
-            .populate('user', 'name email')
-            .populate('serviceType', 'name price duration')
-            .execPopulate();
-
-        // 8. Risposta al client
-        res.json(updatedAppointment);
     } catch (error) {
-        next(error); // Gestione degli errori centralizzata
+        next(error);
     }
 });
-
-
 // DELETE /appointments/:id: Elimina un appuntamento
 appointmentRouter.delete('/:id', authMiddleware, async (req, res, next) => {
     try {

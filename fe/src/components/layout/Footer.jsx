@@ -1,13 +1,7 @@
 import React, { useState } from 'react';
 
 const Footer = () => {
-    const [modalOpen, setModalOpen] = useState(false);
-    const [email, setEmail] = useState('');
-    const [message, setMessage] = useState('');
 
-    const handleModalToggle = () => setModalOpen(!modalOpen);
-    const handleEmailChange = (e) => setEmail(e.target.value);
-    const handleMessageChange = (e) => setMessage(e.target.value);
 
     return (
         <footer className="bg-dark text-white py-4">

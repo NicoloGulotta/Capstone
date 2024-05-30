@@ -1,12 +1,11 @@
 import express from "express";
 import cors from "cors";
-import { config } from "dotenv";
+import dotenv from "dotenv";
 import mongoose from "mongoose";
 import session from "express-session";
-import passport from "passport"; // <-- Rimuovi questa riga, era duplicata
+import { OAuth2Client } from 'google-auth-library';
 
-// Importazione della strategia di Google e dei gestori di errore
-import googleStrategy from "./service/auth/passport.js";
+// Importazione dei gestori di errore
 import {
     badRequestHandler,
     unauthorizedHandler,
@@ -28,10 +27,11 @@ import appointmentRouter from "./service/routes/appointment.router.js";
 import { authMiddleware } from "./service/auth/auth.js";
 
 // Carica le variabili d'ambiente da .env
-config();
+dotenv.config();
 
 // Creazione dell'app Express
 const app = express();
+const client = new OAuth2Client(process.env.G_CLIENT_ID); // Client OAuth2 di Google
 
 // Middleware per la gestione delle sessioni
 app.use(
@@ -42,10 +42,6 @@ app.use(
         cookie: { secure: false }, // Imposta secure: true in produzione se usi HTTPS
     })
 );
-
-// Middleware per Passport.js
-app.use(passport.initialize());
-app.use(passport.session());
 
 // Altri middleware
 app.use(
@@ -58,28 +54,21 @@ app.use(
 );
 app.use(express.json());
 
-// Configurazione della strategia Google per Passport.js
-passport.use("google", googleStrategy);
-
 // Definizione delle rotte
-app.use("/test", testRouter); // Route di test (senza autenticazione)
-app.use("/auth", authRouter); // Route di autenticazione
-app.use("/post", postRouter); // Route per i post
-app.use(
-    "/appointment",
-    authMiddleware,
-    appointmentRouter
-); // Route per gli appuntamenti (richiede autenticazione)
+app.use("/test", testRouter);
+app.use("/auth", authRouter);
+app.use("/post", postRouter);
+app.use("/appointment", authMiddleware, appointmentRouter);
 
 // Middleware per la gestione degli errori (ordine importante)
-app.use(badRequestHandler); // 400 Bad Request
-app.use(unauthorizedHandler); // 401 Unauthorized
-app.use(forbiddenHandler); // 403 Forbidden
-app.use(notFoundHandler); // 404 Not Found
-app.use(conflictHandler); // 409 Conflict
-app.use(tooManyRequestsHandler); // 429 Too Many Requests
-app.use(serviceUnavailableHandler); // 503 Service Unavailable
-app.use(errorHandler); // Gestione generale degli errori
+app.use(badRequestHandler);
+app.use(unauthorizedHandler);
+app.use(forbiddenHandler);
+app.use(notFoundHandler);
+app.use(conflictHandler);
+app.use(tooManyRequestsHandler);
+app.use(serviceUnavailableHandler);
+app.use(errorHandler);
 
 // Error handler generico per errori non gestiti (500 Internal Server Error)
 app.use((err, req, res, next) => {
@@ -100,4 +89,3 @@ const initServer = async () => {
 };
 
 initServer();
-

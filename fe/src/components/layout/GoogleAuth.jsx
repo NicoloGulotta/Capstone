@@ -1,44 +1,47 @@
-import React, { useContext, useState } from "react";
-import { Button, Spinner, Alert } from "react-bootstrap";
-import { AuthContext } from "../../context/AuthContext";
+// GoogleLoginButton.jsx
+import { GoogleLogin } from '@react-oauth/google';
+import { useContext } from 'react';
+import AuthContext from '../../context/AuthContext';
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 
-function GoogleAuth() {
+
+export default function GoogleLoginButton() {
     const { login } = useContext(AuthContext);
     const navigate = useNavigate();
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState(null);
 
-    const handleGoogleAuth = async () => {
-        setIsLoading(true);
-        setError(null); // Reset dell'errore
-
+    const handleGoogleSignIn = async (credentialResponse) => {
         try {
-            await login(); // Chiamata alla funzione di login nel contesto
-            navigate("/"); // Reindirizzamento dopo il login
-        } catch (err) {
-            setError(err.message || "Si è verificato un errore durante l'autenticazione.");
-        } finally {
-            setIsLoading(false);
+            const response = await fetch('/api/auth/google', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ credential: credentialResponse.credential }),
+            });
+
+            if (response.ok) {
+                const { user, token } = await response.json();
+                login(user, token);
+
+                //Reindirizza dopo il login
+                navigate("/");
+
+            } else {
+                toast.error("Si è verificato un errore durante il login, riprova!")
+                console.error('Errore durante il login con Google:', response.statusText);
+            }
+        } catch (error) {
+            toast.error("Si è verificato un errore durante il login, riprova!")
+            console.error('Errore durante il login con Google:', error);
         }
     };
 
     return (
-        <>
-            {error && <Alert variant="danger">{error}</Alert>} {/* Mostra l'errore se presente */}
-            <Button
-                className="bg-dark m-3"
-                onClick={handleGoogleAuth}
-                disabled={isLoading}
-            >
-                {isLoading ? (
-                    <Spinner animation="border" size="sm" />
-                ) : (
-                    "Accedi con Google"
-                )}
-            </Button>
-        </>
+        <GoogleLogin
+            onSuccess={handleGoogleSignIn}
+            onError={() => toast.error("Si è verificato un errore durante il login, riprova!")}
+        />
     );
-}
-
-export default GoogleAuth;
+};

@@ -1,51 +1,47 @@
-// auth.js
 import jwt from 'jsonwebtoken';
 import User from '../models/user.model.js';
-import { config } from 'dotenv';
+import dotenv from 'dotenv'; // Importa dotenv direttamente
 import createError from 'http-errors';
 
-config(); // Carica le variabili d'ambiente
+dotenv.config(); // Carica le variabili d'ambiente
 
-// Funzione per generare un JWT
-export const generateJWT = (payload) =>
-    new Promise((res, rej) => {
-        jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: '1 day' }, (err, token) => {
-            if (err) rej(err);
-            else res(token);
+export const generateJWT = (payload) => {
+    return new Promise((resolve, reject) => { // Usa resolve e reject invece di res e rej
+        jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: '1d' }, (err, token) => {
+            if (err) reject(err);
+            else resolve(token);
         });
     });
+};
 
-// Funzione per verificare un JWT
-export const verifyJWT = (token) =>
-    new Promise((res, rej) => {
+export const verifyJWT = (token) => {
+    return new Promise((resolve, reject) => {
         jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
-            if (err) rej(err);
-            else res(decoded);
+            if (err) reject(err);
+            else resolve(decoded);
         });
     });
+};
 
-// Middleware di autenticazione
 export const authMiddleware = async (req, res, next) => {
-    // console.log("Headers:", req.headers); // Verifica gli header della richiesta
-    // console.log("Auth:", req.headers.authorization);
     try {
-        const token = req.headers.authorization?.split(" ")[1]; // Estrai il token
+        const token = req.headers.authorization?.split(" ")[1];
 
         if (!token) {
             return next(createError(401, 'Token mancante'));
         }
 
-        const decodedToken = await verifyJWT(token); // Usa await per gestire la promessa
-        //localStorage.setItem('token', token);
-        //  localStorage.setItem('user', JSON.stringify(decodedToken));
+        const decodedToken = await verifyJWT(token);
+
+        // Non è necessario memorizzare il token o l'utente nel localStorage qui.
+        // Lo farai nel tuo frontend dopo aver ricevuto la risposta dal backend.
+
         req.user = decodedToken;
-        // console.log(token);
-        // console.log(decodedToken);
         next();
     } catch (error) {
-        console.error("Errore di autenticazione:", error);
+        // Messaggio di errore più informativo per il debug
+        console.error("Errore di autenticazione:", error.name, error.message);
 
-        // Verifica il tipo di errore JWT
         if (error.name === 'JsonWebTokenError') {
             return next(createError(401, 'Token non valido'));
         } else if (error.name === 'TokenExpiredError') {
@@ -54,4 +50,4 @@ export const authMiddleware = async (req, res, next) => {
             return next(createError(500, 'Errore interno del server'));
         }
     }
-}
+};

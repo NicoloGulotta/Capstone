@@ -3,7 +3,13 @@ import React, { useState, useContext } from "react";
 import { Form, Button, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
-import GoogleAuth from "../layout/GoogleAuth";
+// import GoogleAuth from "../layout/GoogleAuth";
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+import dotenv from "dotenv";
+import { config } from "../../../../config.js";
+dotenv.config();
+
+
 function Login() {
     // Ottieni le funzioni e i valori dal contesto di autenticazione
     const { login, error, setError } = useContext(AuthContext);
@@ -13,7 +19,41 @@ function Login() {
         password: "",
     });
     const navigate = useNavigate(); // Hook per la navigazione
+    async function responseMessage(response) {
+        try {
+            const userInfoResponse = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+                headers: {
+                    Authorization: `Bearer ${response.access_token}`,
+                },
+            });
+            const userInfo = await userInfoResponse.json();
 
+            // Chiamata al backend per l'autenticazione e la gestione del token
+            const loginResponse = await fetch("http://localhost:3001/auth/google", { // Assumi che il tuo endpoint sia /auth/google
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ token: response.credential, userInfo }), // Invia il token e i dati dell'utente
+            });
+
+            if (loginResponse.ok) {
+                const data = await loginResponse.json();
+                // Gestione del token e dei dati ricevuti dal backend
+                localStorage.setItem("token", data.token);
+                login(data);
+                navigate("/");
+            } else {
+                // Gestione dell'errore di login
+                const errorData = await loginResponse.json();
+                setError(errorData.message || "Login fallito. Riprova più tardi.");
+            }
+        } catch (error) {
+            console.error("Errore durante la richiesta di login:", error);
+            setError("Errore di rete o del server. Riprova più tardi.");
+        }
+    }
+    const errorMessage = (error) => {
+        console.log(error);
+    };
     // Funzione per gestire le modifiche nei campi del form
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -82,6 +122,13 @@ function Login() {
                     Login
                 </Button>
                 {/* <GoogleAuth /> */}
+                <GoogleOAuthProvider clientId={config.G_CLIENT_ID}>
+                    <GoogleLogin
+                        onSuccess={responseMessage}
+                        onError={errorMessage}
+                        useOneTap
+                    />
+                </GoogleOAuthProvider>
             </Form>
         </div>
     );
