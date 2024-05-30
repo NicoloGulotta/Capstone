@@ -1,0 +1,5 @@
+/* Nel tuo file CSS */
+.social-icons a {
+  margin: 0 10px; /* Spaziatura tra le icone */
+  color: #2a4291; /* Colore delle icone */
+}

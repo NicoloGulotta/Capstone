@@ -1,5 +1,7 @@
 import React from 'react';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFacebook, faTwitter, faInstagram, faLinkedin } from '@fortawesome/free-brands-svg-icons'; // Importa le icone che vuoi usare
+import '../../styles/Footer.css';
 const Footer = () => {
 
 
@@ -24,8 +26,22 @@ const Footer = () => {
                     </div>
                     <div className="col-md-4">
                         <h4>Seguici</h4>
-                        {/* Icone Social più grandi e visibili */}
+                        <div className="social-icons"> {/* Aggiungi una classe per lo stile delle icone */}
+                            <a href="https://www.facebook.com/tuaprofilofacebook" target="_blank" rel="noopener noreferrer">
+                                <FontAwesomeIcon icon={faFacebook} size="2x" /> {/* Icona Facebook */}
+                            </a>
+                            <a href="https://www.twitter.com/tuoprofilotwitter" target="_blank" rel="noopener noreferrer">
+                                <FontAwesomeIcon icon={faTwitter} size="2x" /> {/* Icona Twitter */}
+                            </a>
+                            <a href="https://www.instagram.com/tuoprofiloinstagram" target="_blank" rel="noopener noreferrer">
+                                <FontAwesomeIcon icon={faInstagram} size="2x" /> {/* Icona Instagram */}
+                            </a>
+                            <a href="https://www.linkedin.com/in/tuoprofilolinkedin" target="_blank" rel="noopener noreferrer">
+                                <FontAwesomeIcon icon={faLinkedin} size="2x" /> {/* Icona LinkedIn */}
+                            </a>
+                        </div>
                     </div>
+
                 </div>
                 <div className="row mt-3">
                     <div className="col-12 text-center">

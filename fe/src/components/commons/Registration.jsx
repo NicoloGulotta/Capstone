@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Form, Button } from 'react-bootstrap';
-import '../../styles/Registration.css';
+import { Form, Button, Alert, Container, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import '../../styles/Registration.css'; // Assumiamo che tu abbia uno stile personalizzato
 
-const RegistrationForm = () => {
+function RegistrationForm() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
@@ -14,29 +14,18 @@ const RegistrationForm = () => {
     avatar: '',
     password: '',
   });
-  const [error, setError] = useState(null);
+  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: null });
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    // Validate form fields
-    const errors = {};
-    if (!formData.name.trim()) errors.name = 'Il nome è richiesto';
-    if (!formData.surname.trim()) errors.surname = 'Il cognome è richiesto';
-    if (!formData.username.trim()) errors.username = "L'username è richiesto";
-    if (!formData.email.trim()) errors.email = "L'email è richiesta";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.email = 'Formato email non valido';
-    if (!formData.password.trim()) errors.password = 'La password è richiesta';
-    if (formData.password.length < 8) errors.password = 'La password deve essere di almeno 8 caratteri';
-    if (!formData.dataDiNascita.trim()) errors.dataDiNascita = 'La data di nascita è richiesta';
-
+    const errors = validateForm(formData);
     if (Object.keys(errors).length > 0) {
-      setError(errors);
+      setErrors(errors);
       return;
     }
 
@@ -51,77 +40,134 @@ const RegistrationForm = () => {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Registration failed');
       }
-      const data = await response.json(); // Get data from response
-      const token = data.token; // Extract token from data (adjust if your API response structure is different)
-      localStorage.setItem('token', token); // Store the token
+      const data = await response.json();
+      const token = data.token;
+      localStorage.setItem('token', token);
 
-      // Successful registration
       console.log('Registration successful!');
       navigate('/login');
     } catch (err) {
-      setError(err.message || 'An error occurred');
+      setErrors({ general: err.message || 'An error occurred' });
     }
   };
 
   return (
-    <div className="d-flex align-items-center justify-content-center vh-100 mt-5">
-      <div className="p-3 rounded bg-black w-25 text-white">
-        <h2>Registration</h2>
-        {error && <Error error={error} />}
-        <Form onSubmit={handleSubmit}>
-          <Form.Group controlId="name">
-            <Form.Label>Nome</Form.Label>
-            <Form.Control type="text" name="name" value={formData.name} onChange={handleChange} />
-          </Form.Group>
+    <Container className="mt-5">
+      <Row className="justify-content-center">
+        <Col xs={12} md={8} lg={6}>
+          <h2 className="text-center mb-4">Registration</h2>
+          {errors.general && <Alert variant="danger">{errors.general}</Alert>}
 
-          <Form.Group controlId="surname">
-            <Form.Label>Cognome</Form.Label>
-            <Form.Control type="text" name="surname" value={formData.surname} onChange={handleChange} />
-          </Form.Group>
+          <Form onSubmit={handleSubmit}>
+            {/* Nome */}
+            <Form.Group controlId="name">
+              <Form.Label>Nome</Form.Label>
+              <Form.Control
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                isInvalid={!!errors.name}
+              />
+              <Form.Control.Feedback type="invalid">{errors.name}</Form.Control.Feedback>
+            </Form.Group>
 
-          <Form.Group controlId="username">
-            <Form.Label>Username</Form.Label>
-            <Form.Control type="text" name="username" value={formData.username} onChange={handleChange} />
-          </Form.Group>
+            {/* Cognome */}
+            <Form.Group controlId="surname"><Form.Label>Cognome</Form.Label>
+              <Form.Control
+                type="text"
+                name="surname"
+                value={formData.surname}
+                onChange={handleChange}
+                isInvalid={!!errors.surname}
+              />
+              <Form.Control.Feedback type="invalid">{errors.surname}</Form.Control.Feedback>
+            </Form.Group>
 
-          <Form.Group controlId="email">
-            <Form.Label>Email</Form.Label>
-            <Form.Control type="email" name="email" value={formData.email} onChange={handleChange} />
-          </Form.Group>
+            {/* Username */}
+            <Form.Group controlId="username">
+              <Form.Label>Username</Form.Label>
+              <Form.Control
+                type="text"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                isInvalid={!!errors.username}
+              />
+              <Form.Control.Feedback type="invalid">{errors.username}</Form.Control.Feedback>
+            </Form.Group>
 
-          <Form.Group controlId="password">
-            <Form.Label>Password</Form.Label>
-            <Form.Control type="password" name="password" value={formData.password} onChange={handleChange} />
-          </Form.Group>
+            {/* Email */}
+            <Form.Group controlId="email">
+              <Form.Label>Email</Form.Label>
+              <Form.Control
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                isInvalid={!!errors.email}
+              />
+              <Form.Control.Feedback type="invalid">{errors.email}</Form.Control.Feedback>
+            </Form.Group>
 
-          <Form.Group controlId="dataDiNascita">
-            <Form.Label>Data di nascita</Form.Label>
-            <Form.Control type="date" name="dataDiNascita" value={formData.dataDiNascita} onChange={handleChange} />
-          </Form.Group>
+            {/* Password */}
+            <Form.Group controlId="password">
+              <Form.Label>Password</Form.Label>
+              <Form.Control
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                isInvalid={!!errors.password}
+              />
+              <Form.Control.Feedback type="invalid">{errors.password}</Form.Control.Feedback>
+            </Form.Group>
 
-          <Form.Group controlId="avatar">
-            <Form.Label>Avatar (URL)</Form.Label>
-            <Form.Control type="text" name="avatar" value={formData.avatar} onChange={handleChange} />
-          </Form.Group>
+            {/* Data di Nascita */}
+            <Form.Group controlId="dataDiNascita">
+              <Form.Label>Data di nascita</Form.Label>
+              <Form.Control
+                type="date"
+                name="dataDiNascita"
+                value={formData.dataDiNascita}
+                onChange={handleChange}
+                isInvalid={!!errors.dataDiNascita}
+              />
+              <Form.Control.Feedback type="invalid">{errors.dataDiNascita}</Form.Control.Feedback>
+            </Form.Group>
 
-          <Button type="submit" className="btn m-2 d-flex btn-primary align-items-center justify-content-center">
-            Registrati
-          </Button>
-        </Form>
-      </div>
-    </div>
+            {/* Avatar (opzionale) */}
+            <Form.Group controlId="avatar">
+              <Form.Label>Avatar (URL)</Form.Label>
+              <Form.Control
+                type="text"
+                name="avatar"
+                value={formData.avatar}
+                onChange={handleChange}
+              />
+            </Form.Group>
+
+            <Button type="submit" variant="primary" className="mt-3">
+              Registrati
+            </Button>
+          </Form>
+        </Col>
+      </Row>
+    </Container>
   );
-};
+}
 
-const Error = ({ error }) => {
-  if (!error) return null;
+function validateForm(data) {
+  const errors = {};
+  if (!data.name.trim()) errors.name = 'Il nome è richiesto';
+  if (!data.surname.trim()) errors.surname = 'Il cognome è richiesto';
+  if (!data.username.trim()) errors.username = "L'username è richiesto";
+  if (!data.email.trim()) errors.email = "L'email è richiesta";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) errors.email = 'Formato email non valido';
+  if (!data.password.trim()) errors.password = 'La password è richiesta';
+  if (data.password.length < 8) errors.password = 'La password deve essere di almeno 8 caratteri';
+  if (!data.dataDiNascita.trim()) errors.dataDiNascita = 'La data di nascita è richiesta';
+  return errors;
+}
 
-  return (
-    <p className="text-danger">
-      {Object.keys(error).map((key) => (
-        <span key={key}>{error[key]}</span>
-      ))}
-    </p>
-  );
-};
 export default RegistrationForm;

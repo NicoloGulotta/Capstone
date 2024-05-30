@@ -6,7 +6,7 @@ import { format } from "date-fns";
 import it from "date-fns/locale/it";
 
 function Profile() {
-    const { isAuthenticated, user, token } = useContext(AuthContext);
+    const { isAuthenticated, token } = useContext(AuthContext);
     const [profileData, setProfileData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
