@@ -100,7 +100,7 @@ function AppointmentForm({ postId }) {
                     <Form.Control as="textarea" name="notes" value={formData.notes} onChange={handleChange} />
                 </Form.Group>
 
-                <Button variant="primary" type="submit" className='m-4'>
+                <Button variant="dark" type="submit" className='my-3'>
                     Prenota
                 </Button>
             </Form>

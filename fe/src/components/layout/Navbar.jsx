@@ -60,7 +60,7 @@ function MyNavbar({ onLogout }) {
                                         height="30"
                                         alt="Avatar Utente"
                                     />
-                                    <span className="ms-2">{user?.name}</span>
+                                    <h5 className="ms-2 text-decoration-none">{user?.name}</h5>
                                 </Dropdown.Toggle>
 
                                 <Dropdown.Menu variant="dark">

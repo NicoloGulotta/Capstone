@@ -59,3 +59,20 @@
 .submit-button:hover {
   background-color: #3e8e41; /* Darker green on hover */
 }
+/* Stili per il contenitore dei pulsanti */
+.button-container {
+  display: flex; /* Utilizza Flexbox per l'allineamento */
+  justify-content: space-around; /* Distribuisci lo spazio tra i pulsanti */
+}
+
+/* Stili per i pulsanti (puoi personalizzare questi) */
+.google-login-button {
+  background-color: #4285f4;
+  color: white;
+  padding: 8px 12px; /* Riduci il padding per rendere il pulsante più piccolo */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px; /* Riduci la dimensione del font */
+  margin: 5px; /* Aggiungi un piccolo margine tra i pulsanti */
+}

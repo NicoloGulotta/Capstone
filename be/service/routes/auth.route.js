@@ -86,9 +86,6 @@ authRouter.put('/settings', authMiddleware, async (req, res, next) => {
         const userId = req.user._id;
         const { name, surname, email, password } = req.body;
 
-        // Validazione input e password (se fornita)
-        // ... (come nel codice precedente) ...
-
         const updateData = { name, surname, email };
         if (password) {
             updateData.password = await bcrypt.hash(password, 10);

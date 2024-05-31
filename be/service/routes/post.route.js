@@ -28,7 +28,10 @@ postRouter.get('/:postId', async (req, res, next) => {
             return next(createError(400, "ID post non valido")); // Corretto il messaggio di errore
         }
 
-        const post = await Post.findById(req.params.postId).populate(["user", "comments"]);
+        const post = await Post.findById(req.params.postId)
+            .populate("comments") // Popola i commenti
+            .lean(); // Usa lean() per ottenere un oggetto JavaScript semplice
+
         if (!post) {
             return next(createError(404, "Post non trovato"));
         }
@@ -111,16 +114,57 @@ postRouter.patch('/:postId/cover', authMiddleware, postCover, async (req, res, n
         next(error);
     }
 });
+// GET /posts/:postId/comments: Ottieni i commenti di un post specifico
+postRouter.get("/:postId/comments", async (req, res, next) => {
+    try {
+        const postId = req.params.postId;
 
+        // Verifica se l'ID del post è valido
+        if (!mongoose.Types.ObjectId.isValid(postId)) {
+            return next(createError(400, "ID post non valido"));
+        }
 
-// POST /posts/:postId/comments: Aggiungi un commento a un post
-postRouter.post('/:postId/comments', authMiddleware, async (req, res, next) => { // Aggiunto authMiddleware
+        // Trova tutti i commenti del post specificato, filtrando il campo `comment`
+        const comments = await Comment.find({
+            post: postId,
+            _id: { $nin: Post.comment }  // <-- Filtra commenti non presenti in 'comment'
+        })
+            .populate("author");
+
+        res.send(comments);
+    } catch (error) {
+        next(error);
+    }
+});
+// GET /comments/user/:userId: Ottieni tutti i commenti di uno specifico utente
+postRouter.get('/comments/:userId', async (req, res, next) => {
+    try {
+        const userId = req.params.userId;
+
+        // Verifica se l'ID utente è valido
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return next(createError(400, "ID utente non valido"));
+        }
+
+        // Trova tutti i commenti dell'utente specificato
+        const comments = await Comment.find({ author: userId }).populate("author"); // Popola i dettagli dell'autore
+
+        res.send(comments);
+    } catch (error) {
+        next(error);
+    }
+});
+
+// POST /posts/:postId/comments: Crea un nuovo commento
+postRouter.post("/:postId/comments", authMiddleware, async (req, res, next) => {
     try {
         const commentData = req.body;
-        commentData.author = req.user._id; // Assegna l'ID dell'utente autenticato come autore del commento
+        commentData.author = req.user._id;
+        commentData.post = req.params.postId; // Associa il commento al post
 
         const comment = await Comment.create(commentData);
 
+        // Aggiorna SOLO il campo 'comments'
         const post = await Post.findByIdAndUpdate(
             req.params.postId,
             { $push: { comments: comment._id } },
@@ -131,11 +175,21 @@ postRouter.post('/:postId/comments', authMiddleware, async (req, res, next) => {
             return next(createError(404, "Post non trovato"));
         }
 
-        res.send(post); // Invia il post aggiornato con il nuovo commento
+        res.send(post);
     } catch (error) {
         next(error);
     }
 });
+// async function removeCommentField() {
+//     try {
+//         const result = await Post.updateMany({}, { $unset: { comment: "" } });
+//         console.log(`Campo 'comment' rimosso da ${result.modifiedCount} documenti.`);
+//     } catch (error) {
+//         console.error("Errore durante la rimozione del campo:", error);
+//     }
+// }
+
+// removeCommentField();
 
 // PUT /posts/:postId/comments/:commentId: Aggiorna un commento esistente
 postRouter.put('/:postId/comments/:commentId', authMiddleware, async (req, res, next) => {

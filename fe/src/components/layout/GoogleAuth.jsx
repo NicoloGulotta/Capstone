@@ -40,6 +40,7 @@ export default function GoogleLoginButton() {
 
     return (
         <GoogleLogin
+
             onSuccess={handleGoogleSignIn}
             onError={() => toast.error("Si è verificato un errore durante il login, riprova!")}
         />

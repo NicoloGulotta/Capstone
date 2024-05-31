@@ -89,9 +89,9 @@ function Login() {
             setError("Errore di rete o del server. Riprova più tardi.");
         }
     };
-    // Restituisci il JSX del componente
+    console.log(config.G_CLIENT_ID);
     return (
-        <div>
+        <div className="login-form">
             <h2>Login</h2>
             {error && <Alert variant="danger">{error}</Alert>}
             <Form onSubmit={handleSubmit}>
@@ -116,17 +116,23 @@ function Login() {
                         onChange={handleChange}
                     />
                 </Form.Group>
-                <Button variant="dark" type="submit">
+                <Button variant="dark" className="my-3" type="submit">
                     Login
                 </Button>
                 {/* <GoogleAuth /> */}
                 <GoogleOAuthProvider clientId={config.G_CLIENT_ID}>
-                    <GoogleLogin
-                        onSuccess={responseMessage}
-                        onError={errorMessage}
-                        useOneTap
-                    />
+                    <div className="button-container"> {/* Aggiungi un contenitore */}
+                        <GoogleLogin
+                            onSuccess={responseMessage}
+                            onError={errorMessage}
+                            useOneTap
+                            redirect_uri="http://localhost:3001/auth/google/callback"
+                            className="google-login-button"
+                        />
+                    </div>
                 </GoogleOAuthProvider>
+
+
             </Form>
         </div>
     );
