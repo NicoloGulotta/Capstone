@@ -156,7 +156,7 @@ function Settings() {
                 <Button variant="primary" type="submit" disabled={isLoading}>
                     {isLoading ? 'Salvataggio...' : 'Salva Modifiche'}
                 </Button>
-                <Button variant="danger" className="mt-3 ms-3" onClick={logout}>
+                <Button variant="danger" className="m-3 ms-3" onClick={logout}>
                     Logout
                 </Button>
             </Form>

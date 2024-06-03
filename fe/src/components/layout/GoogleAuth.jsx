@@ -13,7 +13,7 @@ export default function GoogleLoginButton() {
 
     const handleGoogleSignIn = async (credentialResponse) => {
         try {
-            const response = await fetch('/api/auth/google', {
+            const response = await fetch('http://localhost:3001/auth/google', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -40,9 +40,11 @@ export default function GoogleLoginButton() {
 
     return (
         <GoogleLogin
-
             onSuccess={handleGoogleSignIn}
-            onError={() => toast.error("Si è verificato un errore durante il login, riprova!")}
+            onError={(err) => {
+                console.error("Login Error:", err);
+                toast.error("Si è verificato un errore durante il login, riprova!");
+            }}
         />
     );
 };

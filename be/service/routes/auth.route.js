@@ -107,7 +107,7 @@ authRouter.put('/settings', authMiddleware, async (req, res, next) => {
 });
 
 // GET /auth/google/callback: Callback per l'autenticazione Google
-authRouter.get('/google/callback', async (req, res) => {
+authRouter.get('auth/google/callback', async (req, res) => {
     try {
         const code = req.query.code;
 
@@ -152,7 +152,11 @@ authRouter.get('/google/callback', async (req, res) => {
         res.redirect(process.env.FRONTEND_URL || 'http://localhost:3000/');
     } catch (error) {
         console.error("Errore durante il callback di Google:", error);
-        res.status(500).send("Errore durante l'autenticazione.");
+        if (error.response && error.response.status === 403) {
+            res.status(403).send("Accesso non autorizzato.");
+        } else {
+            res.status(500).send("Errore durante l'autenticazione.");
+        }
     }
 });
 

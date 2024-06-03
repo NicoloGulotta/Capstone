@@ -27,9 +27,6 @@ function MyNavbar({ onLogout }) {
                                 Crea Post
                             </Nav.Link>
                         )} */}
-                        <Button variant="outline-light" onClick={handleShow}>
-                            Contattaci
-                        </Button>
 
                         <Modal show={showModal} onHide={handleClose}>
                             <Modal.Header closeButton>
@@ -50,11 +47,14 @@ function MyNavbar({ onLogout }) {
                     </Nav>
 
                     <Nav>
+                        <Button variant="outline-light" onClick={handleShow}>
+                            Contattaci
+                        </Button>
                         {isAuthenticated ? (
                             <Dropdown align="end">
                                 <Dropdown.Toggle variant="link" id="dropdown-user" className="text-light d-flex align-items-center">
                                     <Image
-                                        src={user?.avatar || "https://via.placeholder.com/150"}
+                                        src={user?.avatar || 'https://gravatar.com/avatar/b58a6ab54ad426a204ad8224c6c0390b?s=400&d=robohash&r=X'}
                                         roundedCircle
                                         width="30"
                                         height="30"
