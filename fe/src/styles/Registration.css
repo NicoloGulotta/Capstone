@@ -1,0 +1,103 @@
+/* Stili generali per la pagina di login/registrazione */
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; /* Font moderno */
+  background-color: #f4f4f4; /* Sfondo grigio chiaro */
+  color: #333; /* Colore del testo grigio scuro */
+}
+
+/* Contenitore del form */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px; /* Spazio intorno al form */
+}
+
+.login-container {
+  background-color: #fff;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 400px; /* Larghezza del form */
+}
+
+.login-title {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+/* Stili per i gruppi di input */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  font-weight: bold;
+  display: block;
+}
+
+/* Stili per gli input */
+.form-control {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  box-sizing: border-box;
+  font-size: 16px;
+  transition: border-color 0.3s ease; /* Transizione per il colore del bordo */
+}
+
+.form-control:focus {
+  border-color: #4285f4; /* Blu Google al focus */
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(66, 133, 244, 0.25);
+}
+
+/* Stili per il contenitore dell'input con icona */
+.input-group {
+  position: relative;
+}
+
+/* Stili per l'icona all'interno dell'input */
+.input-group-append .btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+/* Messaggi di errore */
+.error-message {
+  color: #dc3545;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+/* Pulsante di login/registrazione */
+.submit-button {
+  background-color: #4285f4; /* Blu Google */
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+  background-color: #3367d6; /* Blu più scuro al passaggio del mouse */
+}
+
+/* Pulsante Google */
+.google-login-button {
+  /* Puoi personalizzare ulteriormente lo stile del pulsante Google qui */
+}

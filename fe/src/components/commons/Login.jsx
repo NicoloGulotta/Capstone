@@ -8,8 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { config } from "../../context/config";
-// Carica le variabili d'ambiente dal file .env
-// require("dotenv").config();
+import "../../styles/Login.css";
 
 function Login() {
     const { login, error, setError } = useContext(AuthContext);
@@ -19,8 +18,8 @@ function Login() {
 
     useEffect(() => {
         // Verifica se il Client ID è presente nel file .env
-        if (!process.env.REACT_APP_G_CLIENT_ID) {
-            console.error("REACT_APP_G_CLIENT_ID is not defined in .env file.");
+        if (!config.REACT_APP_G_CLIENT_ID) {
+            console.error("REACT_APP_G_CLIENT_ID is not defined in config file.");
         }
     }, []);
 
@@ -100,6 +99,7 @@ function Login() {
     const togglePasswordVisibility = () => {
         setShowPassword((prevState) => !prevState);
     };
+
     return (
         <div className="login-form">
             <h2>Login</h2>
@@ -117,8 +117,8 @@ function Login() {
                     />
                 </Form.Group>
 
-                <Form.Group controlId="formBasicPassword">
-                    <Form.Label>Password</Form.Label>
+                <Form.Group controlId="formBasicPassword" className="input-group">
+                    <Form.Label className="input-group-prepend">Password</Form.Label>
                     <Form.Control
                         type={showPassword ? "text" : "password"}
                         name="password"
@@ -127,16 +127,18 @@ function Login() {
                         onChange={handleChange}
                         required
                     />
-                    <Button variant="outline-secondary" onClick={togglePasswordVisibility} className="mt-2">
-                        <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
-                    </Button>
+                    <div className="input-group-append">
+                        <Button variant="outline-secondary" onClick={togglePasswordVisibility}>
+                            <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                        </Button>
+                    </div>
                 </Form.Group>
 
-                <Button variant="primary" type="submit" className="mb-3">
+                <Button variant="primary" type="submit" className="my-3">
                     Login
                 </Button>
 
-                <GoogleOAuthProvider clientId={config.G_CLIENT_ID}>
+                <GoogleOAuthProvider clientId={config.REACT_APP_G_CLIENT_ID}>
                     <GoogleLogin
                         onSuccess={handleGoogleSignIn}
                         onError={(err) => {

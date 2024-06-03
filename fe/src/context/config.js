@@ -1,3 +1,4 @@
+// config.js
 export const config = {
-    G_CLIENT_ID: '411367577688-qlq92n8oldhcu59936h6vaa9b1i2jvm7.apps.googleusercontent.com',
+    REACT_APP_G_CLIENT_ID: '411367577688-3k67frp7212av717pt0dbgte6148e0f2.apps.googleusercontent.com',
 };

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Form, Button, Alert, Container, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import '../../styles/Registration.css'; // Assumiamo che tu abbia uno stile personalizzato
+import '../../styles/Registration.css';
 
 function RegistrationForm() {
   const navigate = useNavigate();
@@ -147,7 +147,7 @@ function RegistrationForm() {
               />
             </Form.Group>
 
-            <Button type="submit" variant="primary" className="mt-3">
+            <Button type="submit" variant="primary" className="my-3">
               Registrati
             </Button>
           </Form>
