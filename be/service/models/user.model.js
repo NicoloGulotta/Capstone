@@ -44,6 +44,7 @@ const userSchema = new Schema(
         googleId: {
             type: String,
             required: false,
+            unique: true,
         },
         comments: [
             {

@@ -3,23 +3,23 @@ import bcrypt from "bcryptjs";
 import User from "../models/user.model.js";
 import { authMiddleware, generateJWT } from "../auth/auth.js";
 import createError from "http-errors";
-import { OAuth2Client } from 'google-auth-library';
-
+import passport from "passport";
 const authRouter = Router();
-const client = new OAuth2Client(process.env.G_CLIENT_ID); // Client OAuth2 di Google
 
-// GET /auth/login: Restituisce una semplice pagina di login (o un redirect)
+// --- ROTTE DI AUTENTICAZIONE ---
+
+// GET /auth/login (Redirect al frontend)
 authRouter.get("/login", (req, res) => {
-    // Puoi scegliere se inviare una pagina HTML di login o reindirizzare direttamente
-    res.redirect(process.env.FRONTEND_URL + "/login"); // Esempio di redirect al frontend
+    res.redirect(`${process.env.FRONTEND_URL}/login`);
 });
 
-// POST /auth/register: Registra un nuovo utente
+// POST /auth/register (Registrazione nuovo utente)
 authRouter.post("/register", async (req, res, next) => {
     try {
-        const hashedPassword = await bcrypt.hash(req.body.password, 10);
-        const user = await User.create({ ...req.body, password: hashedPassword });
-        res.status(201).json(user); // 201 Created
+        const { email, password, ...rest } = req.body; // Destrutturazione per evitare di salvare dati indesiderati
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const user = await User.create({ email, password: hashedPassword, ...rest });
+        res.status(201).json({ message: "Registrazione avvenuta con successo" }); // Messaggio più informativo
     } catch (error) {
         if (error.code === 11000) { // Errore di duplicazione (es. email già esistente)
             return next(createError(409, "Email già registrata"));
@@ -28,24 +28,17 @@ authRouter.post("/register", async (req, res, next) => {
     }
 });
 
-// POST /auth/login: Effettua il login di un utente esistente
+// POST /auth/login (Login utente esistente)
 authRouter.post("/login", async (req, res, next) => {
     try {
         const { email, password } = req.body;
+        const user = await User.findOne({ email }).select("+password");
 
-        if (!email || !password) {
-            return next(createError(400, "Email e password sono obbligatori"));
-        }
-
-        const user = await User.findOne({ email }).select("+password"); // Includi il campo password
         if (!user || !(await bcrypt.compare(password, user.password))) {
             return next(createError(401, "Credenziali non valide"));
         }
 
-        // Genera il JWT
         const token = await generateJWT({ _id: user._id });
-
-        // Dati dell'utente da inviare (escludi la password!)
         const userToSend = user.toObject();
         delete userToSend.password;
 
@@ -55,15 +48,12 @@ authRouter.post("/login", async (req, res, next) => {
     }
 });
 
-// GET /auth/profile: Ottiene i dati del profilo dell'utente autenticato
+// GET /auth/profile (Dati del profilo utente autenticato)
 authRouter.get("/profile", authMiddleware, async (req, res, next) => {
     try {
         const user = await User.findById(req.user._id)
-            .select("name surname email comments role appointments") // Personalizza i campi da includere
-            .populate({
-                path: "appointments",
-                populate: { path: "serviceType" } // Popola i dettagli del tipo di servizio degli appuntamenti
-            });
+            .select("-password -__v") // Escludi password e __v
+            .populate("appointments", "serviceType -_id"); // Popola solo l'ID del serviceType degli appuntamenti
 
         if (!user) {
             return next(createError(404, "Utente non trovato"));
@@ -75,90 +65,45 @@ authRouter.get("/profile", authMiddleware, async (req, res, next) => {
     }
 });
 
-// GET /auth/check-admin: Verifica se l'utente è un amministratore
-authRouter.get("/check-admin", authMiddleware, async (req, res, next) => {
-    res.json({ isAdmin: req.user.role === "admin" }); // Invia un booleano per indicare se è admin
+// GET /auth/check-admin (Verifica ruolo amministratore)
+authRouter.get("/check-admin", authMiddleware, (req, res) => {
+    res.json({ isAdmin: req.user.role === "admin" });
 });
 
-// PUT /auth/settings: Aggiorna i dati del profilo dell'utente autenticato
-authRouter.put('/settings', authMiddleware, async (req, res, next) => {
+// PUT /auth/settings (Aggiorna dati profilo)
+authRouter.put("/settings", authMiddleware, async (req, res, next) => {
     try {
         const userId = req.user._id;
         const { name, surname, email, password } = req.body;
 
         const updateData = { name, surname, email };
+
         if (password) {
             updateData.password = await bcrypt.hash(password, 10);
         }
 
-        const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true });
+        const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true }).select("-password -__v"); // Escludi password e __v
 
         if (!updatedUser) {
             return next(createError(404, "Utente non trovato"));
         }
 
-        // Rimuovi il campo password dalla risposta
-        const userWithoutPassword = updatedUser.toObject();
-        delete userWithoutPassword.password;
-        res.json(userWithoutPassword);
+        res.json(updatedUser);
     } catch (error) {
         next(error);
     }
 });
 
-// GET /auth/google/callback: Callback per l'autenticazione Google
-authRouter.get('auth/google/callback', async (req, res) => {
-    try {
-        const code = req.query.code;
+// --- ROTTE GOOGLE AUTH ---
+authRouter.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
 
-        const { tokens } = await client.getToken(code);
-        const ticket = await client.verifyIdToken({
-            idToken: tokens.id_token,
-            audience: process.env.G_CLIENT_ID,
-        });
-        const payload = ticket.getPayload();
-        const { email, name, picture } = payload;
-
-        // 1. Cerca l'utente nel database per email
-        let user = await User.findOne({ email });
-
-        if (!user) {
-            // 2. Se non esiste, crea un nuovo utente
-            user = new User({
-                email,
-                name,
-                picture,
-                // ... altri campi del tuo modello User ...
-            });
-            await user.save();
-        } else {
-            // 3. Se esiste, aggiorna i dati (se necessario)
-            user.name = name; // Esempio di aggiornamento
-            user.picture = picture;
-            await user.save();
-        }
-
-        // 4. Genera il token JWT 
-        const token = generateJWT({ _id: user._id });
-
-        // 5. Imposta il token come cookie
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: 'none', // necessario per i cookie cross-origin
-        });
-
-        // 6. Reindirizza al frontend
-        res.redirect(process.env.FRONTEND_URL || 'http://localhost:3000/');
-    } catch (error) {
-        console.error("Errore durante il callback di Google:", error);
-        if (error.response && error.response.status === 403) {
-            res.status(403).send("Accesso non autorizzato.");
-        } else {
-            res.status(500).send("Errore durante l'autenticazione.");
-        }
+authRouter.get(
+    "/google/callback",
+    passport.authenticate("google", { failureRedirect: `${process.env.FRONTEND_URL}/login` }),
+    (req, res) => {
+        res.redirect(`${process.env.FRONTEND_URL}`);
     }
-});
+);
 
 
 export default authRouter;
