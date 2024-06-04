@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Form, Button, Alert, Container, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import '../../styles/Registration.css';
-
 function RegistrationForm() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -55,102 +54,104 @@ function RegistrationForm() {
     <Container className="mt-5">
       <Row className="justify-content-center">
         <Col xs={12} md={8} lg={6}>
-          <h2 className="text-center mb-4">Registration</h2>
-          {errors.general && <Alert variant="danger">{errors.general}</Alert>}
+          <div className="regastration-form">
+            <h2 className="text-center mb-4">Registrati</h2>
+            {errors.general && <Alert variant="danger">{errors.general}</Alert>}
 
-          <Form onSubmit={handleSubmit}>
-            {/* Nome */}
-            <Form.Group controlId="name">
-              <Form.Label>Nome</Form.Label>
-              <Form.Control
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                isInvalid={!!errors.name}
-              />
-              <Form.Control.Feedback type="invalid">{errors.name}</Form.Control.Feedback>
-            </Form.Group>
+            <Form onSubmit={handleSubmit}>
+              {/* Nome */}
+              <Form.Group controlId="name">
+                <Form.Label>Nome</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  isInvalid={!!errors.name}
+                />
+                <Form.Control.Feedback type="invalid">{errors.name}</Form.Control.Feedback>
+              </Form.Group>
 
-            {/* Cognome */}
-            <Form.Group controlId="surname"><Form.Label>Cognome</Form.Label>
-              <Form.Control
-                type="text"
-                name="surname"
-                value={formData.surname}
-                onChange={handleChange}
-                isInvalid={!!errors.surname}
-              />
-              <Form.Control.Feedback type="invalid">{errors.surname}</Form.Control.Feedback>
-            </Form.Group>
+              {/* Cognome */}
+              <Form.Group controlId="surname"><Form.Label>Cognome</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="surname"
+                  value={formData.surname}
+                  onChange={handleChange}
+                  isInvalid={!!errors.surname}
+                />
+                <Form.Control.Feedback type="invalid">{errors.surname}</Form.Control.Feedback>
+              </Form.Group>
 
-            {/* Username */}
-            <Form.Group controlId="username">
-              <Form.Label>Username</Form.Label>
-              <Form.Control
-                type="text"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                isInvalid={!!errors.username}
-              />
-              <Form.Control.Feedback type="invalid">{errors.username}</Form.Control.Feedback>
-            </Form.Group>
+              {/* Username */}
+              <Form.Group controlId="username">
+                <Form.Label>Username</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  isInvalid={!!errors.username}
+                />
+                <Form.Control.Feedback type="invalid">{errors.username}</Form.Control.Feedback>
+              </Form.Group>
 
-            {/* Email */}
-            <Form.Group controlId="email">
-              <Form.Label>Email</Form.Label>
-              <Form.Control
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                isInvalid={!!errors.email}
-              />
-              <Form.Control.Feedback type="invalid">{errors.email}</Form.Control.Feedback>
-            </Form.Group>
+              {/* Email */}
+              <Form.Group controlId="email">
+                <Form.Label>Email</Form.Label>
+                <Form.Control
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  isInvalid={!!errors.email}
+                />
+                <Form.Control.Feedback type="invalid">{errors.email}</Form.Control.Feedback>
+              </Form.Group>
 
-            {/* Password */}
-            <Form.Group controlId="password">
-              <Form.Label>Password</Form.Label>
-              <Form.Control
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                isInvalid={!!errors.password}
-              />
-              <Form.Control.Feedback type="invalid">{errors.password}</Form.Control.Feedback>
-            </Form.Group>
+              {/* Password */}
+              <Form.Group controlId="password">
+                <Form.Label>Password</Form.Label>
+                <Form.Control
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  isInvalid={!!errors.password}
+                />
+                <Form.Control.Feedback type="invalid">{errors.password}</Form.Control.Feedback>
+              </Form.Group>
 
-            {/* Data di Nascita */}
-            <Form.Group controlId="dataDiNascita">
-              <Form.Label>Data di nascita</Form.Label>
-              <Form.Control
-                type="date"
-                name="dataDiNascita"
-                value={formData.dataDiNascita}
-                onChange={handleChange}
-                isInvalid={!!errors.dataDiNascita}
-              />
-              <Form.Control.Feedback type="invalid">{errors.dataDiNascita}</Form.Control.Feedback>
-            </Form.Group>
+              {/* Data di Nascita */}
+              <Form.Group controlId="dataDiNascita">
+                <Form.Label>Data di nascita</Form.Label>
+                <Form.Control
+                  type="date"
+                  name="dataDiNascita"
+                  value={formData.dataDiNascita}
+                  onChange={handleChange}
+                  isInvalid={!!errors.dataDiNascita}
+                />
+                <Form.Control.Feedback type="invalid">{errors.dataDiNascita}</Form.Control.Feedback>
+              </Form.Group>
 
-            {/* Avatar (opzionale) */}
-            <Form.Group controlId="avatar">
-              <Form.Label>Avatar (URL)</Form.Label>
-              <Form.Control
-                type="text"
-                name="avatar"
-                value={formData.avatar}
-                onChange={handleChange}
-              />
-            </Form.Group>
+              {/* Avatar (opzionale) */}
+              <Form.Group controlId="avatar">
+                <Form.Label>Avatar (URL)</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="avatar"
+                  value={formData.avatar}
+                  onChange={handleChange}
+                />
+              </Form.Group>
 
-            <Button type="submit" variant="primary" className="my-3">
-              Registrati
-            </Button>
-          </Form>
+              <Button type="submit" variant="primary" className="my-3">
+                Registrati
+              </Button>
+            </Form>
+          </div>
         </Col>
       </Row>
     </Container>

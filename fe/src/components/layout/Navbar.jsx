@@ -9,7 +9,7 @@ function MyNavbar({ onLogout }) {
 
     const handleClose = () => setShowModal(false);
     const handleShow = () => setShowModal(true);
-
+    console.log(user);
     return (
         <Navbar bg="dark" variant="dark" expand="lg" className="mb-3">
             <Container>
@@ -52,15 +52,15 @@ function MyNavbar({ onLogout }) {
                         </Button>
                         {isAuthenticated ? (
                             <Dropdown align="end">
-                                <Dropdown.Toggle variant="link" id="dropdown-user" className="text-light d-flex align-items-center">
-                                    <Image
+                                <Dropdown.Toggle variant="link" id="dropdown-user" className="text-light d-flex align-items-baseline text-decoration-none">
+                                    <img
                                         src={user?.avatar || 'https://gravatar.com/avatar/b58a6ab54ad426a204ad8224c6c0390b?s=400&d=robohash&r=X'}
                                         roundedCircle
                                         width="30"
                                         height="30"
                                         alt="Avatar Utente"
                                     />
-                                    <h5 className="ms-2 text-decoration-none">{user?.name}</h5>
+                                    {/* <h5 className="mt-3">{user?.name}</h5> */}
                                 </Dropdown.Toggle>
 
                                 <Dropdown.Menu variant="dark">

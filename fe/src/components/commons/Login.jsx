@@ -3,63 +3,46 @@ import { Form, Button, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import "react-toastify/dist/ReactToastify.css"; // Stili per le notifiche (toast)
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import { config } from "../../context/config";
-import "../../styles/Login.css";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons"; // Icone per mostrare/nascondere la password
+import { config } from "../../context/config"; // Configurazioni dell'app (es. client ID di Google)
+import "../../styles/Login.css"; // Stili personalizzati per il componente
 
 function Login() {
-    const { login, error, setError } = useContext(AuthContext);
-    const [formData, setFormData] = useState({ email: "", password: "" });
-    const [showPassword, setShowPassword] = useState(false);
-    const navigate = useNavigate();
+    // Context e gestione dello stato
+    const { login, error, setError } = useContext(AuthContext); // Ottieni le funzioni di login e gestione degli errori dal contesto
+    const [formData, setFormData] = useState({ email: "", password: "" }); // Stato per i dati del form
+    const [showPassword, setShowPassword] = useState(false); // Stato per mostrare/nascondere la password
+    const navigate = useNavigate(); // Hook per la navigazione
 
+    // Verifica la presenza del Client ID di Google all'avvio del componente
     useEffect(() => {
-        // Verifica se il Client ID è presente nel file .env
         if (!config.REACT_APP_G_CLIENT_ID) {
-            console.error("REACT_APP_G_CLIENT_ID is not defined in config file.");
+            console.error("REACT_APP_G_CLIENT_ID non definito nel file di configurazione.");
         }
     }, []);
 
+    // Funzione per gestire l'accesso con Google
     async function handleGoogleSignIn(credentialResponse) {
         try {
-            const userInfoResponse = await fetch(
-                "https://www.googleapis.com/oauth2/v3/userinfo",
-                {
-                    headers: {
-                        Authorization: `Bearer ${credentialResponse.credential}`,
-                    },
-                }
-            );
+            // Invia una richiesta al backend per gestire l'autenticazione Google
+            const loginResponse = await fetch("/auth/google/callback", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    credential: credentialResponse.credential, // Invia il token ID di Google
+                }),
+            });
 
-            if (!userInfoResponse.ok) {
-                throw new Error("Failed to fetch user info from Google.");
-            }
-
-            const userInfo = await userInfoResponse.json();
-
-            const loginResponse = await fetch(
-                "http://localhost:3001/auth/google/callback", // Assicurati che questo URL sia corretto
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        credential: credentialResponse.credential,
-                        userInfo,
-                    }),
-                }
-            );
-
-            if (loginResponse.ok) {
+            if (loginResponse.ok) { // Se l'autenticazione ha successo
                 const data = await loginResponse.json();
-                localStorage.setItem("token", data.token);
-                login(data);
-                navigate("/");
-            } else {
+                localStorage.setItem("token", data.token); // Salva il token nel localStorage
+                login(data); // Aggiorna il contesto di autenticazione
+                navigate("/"); // Reindirizza alla home page
+            } else { // Se l'autenticazione fallisce
                 const errorData = await loginResponse.json();
-                setError(errorData.message || "Google login failed.");
+                setError(errorData.message || "Google login failed."); // Imposta il messaggio di errore
             }
         } catch (error) {
             console.error("Error during Google login:", error.message);
@@ -67,28 +50,31 @@ function Login() {
         }
     }
 
+    // Funzione per gestire le modifiche nei campi del form
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    // Funzione per gestire l'invio del form (login con email e password)
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        e.preventDefault(); // Impedisci il comportamento predefinito del form
 
         try {
-            const response = await fetch("http://localhost:3001/auth/login", { // Assicurati che questo URL sia corretto
+            // Invia una richiesta al backend per gestire l'autenticazione con email e password
+            const response = await fetch("/auth/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),
             });
 
-            if (response.ok) {
+            if (response.ok) { // Se l'autenticazione ha successo
                 const data = await response.json();
-                localStorage.setItem("token", data.token);
-                login(data);
-                navigate("/");
-            } else {
+                localStorage.setItem("token", data.token); // Salva il token nel localStorage
+                login(data); // Aggiorna il contesto di autenticazione
+                navigate("/"); // Reindirizza alla home page
+            } else { // Se l'autenticazione fallisce
                 const errorData = await response.json();
-                setError(errorData.message || "Login failed. Check your credentials.");
+                setError(errorData.message || "Login failed. Check your credentials."); // Imposta il messaggio di errore
             }
         } catch (err) {
             console.error("Error during login request:", err.message);
@@ -96,42 +82,53 @@ function Login() {
         }
     };
 
+    // Funzione per mostrare/nascondere la password
     const togglePasswordVisibility = () => {
         setShowPassword((prevState) => !prevState);
     };
-
     return (
         <div className="login-form">
             <h2>Login</h2>
             {error && <Alert variant="danger">{error}</Alert>}
             <Form onSubmit={handleSubmit}>
-                <Form.Group controlId="formBasicEmail">
-                    <Form.Label>Email address</Form.Label>
+                <Form.Group controlId="emailInput">
+                    <Form.Label >Indirizzo Email</Form.Label>
                     <Form.Control
                         type="email"
+                        id="email"
                         name="email"
-                        placeholder="Enter email"
+                        placeholder="Inserisci l'email"
                         value={formData.email}
                         onChange={handleChange}
                         required
+                        aria-describedby="emailHelp" // Associa il campo all'help text
                     />
+                    <Form.Text id="emailHelp" muted>
+                        Non condivideremo la tua email con nessuno.
+                    </Form.Text>
                 </Form.Group>
 
-                <Form.Group controlId="formBasicPassword" className="input-group">
-                    <Form.Label className="input-group-prepend">Password</Form.Label>
-                    <Form.Control
-                        type={showPassword ? "text" : "password"}
-                        name="password"
-                        placeholder="Password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        required
-                    />
-                    <div className="input-group-append">
-                        <Button variant="outline-secondary" onClick={togglePasswordVisibility}>
-                            <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
-                        </Button>
+                <Form.Group controlId="passwordInput">
+                    <Form.Label htmlFor="password">Password</Form.Label>
+                    <div className="input-group">
+                        <Form.Control
+                            type={showPassword ? "text" : "password"}
+                            name="password"
+                            placeholder="Password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            required
+                            aria-describedby="passwordHelp"
+                        />
+                        <div className="input-group-append align-self-center">
+                            <Button variant="outline-secondary" onClick={togglePasswordVisibility}>
+                                <FontAwesomeIcon className="my-3" icon={showPassword ? faEyeSlash : faEye} />
+                            </Button>
+                        </div>
                     </div>
+                    <Form.Text id="passwordHelp" muted>
+                        La password deve essere di almeno 8 caratteri.
+                    </Form.Text>
                 </Form.Group>
 
                 <Button variant="primary" type="submit" className="my-3">

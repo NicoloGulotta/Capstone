@@ -1,103 +1,56 @@
-/* Stili generali per la pagina di login/registrazione */
-body {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; /* Font moderno */
-  background-color: #f4f4f4; /* Sfondo grigio chiaro */
-  color: #333; /* Colore del testo grigio scuro */
-}
-
-/* Contenitore del form */
-.login-form {
+.registration-form {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  padding: 20px; /* Spazio intorno al form */
-}
-
-.login-container {
+  padding: 30px;
+  border-radius: 8px;
   background-color: #fff;
-  padding: 40px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 400px; /* Larghezza del form */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.login-title {
-  text-align: center;
-  margin-bottom: 30px;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-/* Stili per i gruppi di input */
-.form-group {
+.registration-form h2 {
   margin-bottom: 20px;
+  font-size: 2em;
+  color: #333;
+  text-align: center;
+  font-weight: 600; /* Rende il titolo leggermente più spesso */
 }
 
-.form-label {
-  font-weight: bold;
-  display: block;
+.registration-form .form-group {
+  margin-bottom: 15px;
+  width: 100%;
 }
 
-/* Stili per gli input */
-.form-control {
+.registration-form .form-control {
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #ced4da; /* Colore di sfondo grigio chiaro di Bootstrap */
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; /* Transizioni fluide */
+}
+
+.registration-form .form-control:focus {
+  border-color: #007bff; /* Colore di focus blu di Bootstrap */
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Ombra di focus di Bootstrap */
+}
+
+.registration-form .form-label {
+  font-weight: 500;
+}
+
+.registration-form .btn-primary {
   width: 100%;
   padding: 12px;
-  border: 1px solid #ced4da;
-  border-radius: 5px;
-  box-sizing: border-box;
-  font-size: 16px;
-  transition: border-color 0.3s ease; /* Transizione per il colore del bordo */
-}
-
-.form-control:focus {
-  border-color: #4285f4; /* Blu Google al focus */
-  outline: none;
-  box-shadow: 0 0 0 0.2rem rgba(66, 133, 244, 0.25);
-}
-
-/* Stili per il contenitore dell'input con icona */
-.input-group {
-  position: relative;
-}
-
-/* Stili per l'icona all'interno dell'input */
-.input-group-append .btn {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  padding: 0;
-}
-
-/* Messaggi di errore */
-.error-message {
-  color: #dc3545;
-  font-size: 14px;
-  margin-top: 5px;
-}
-
-/* Pulsante di login/registrazione */
-.submit-button {
-  background-color: #4285f4; /* Blu Google */
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  width: 100%;
-  font-size: 16px;
+  border-radius: 8px;
+  background-color: #007bff;
+  border-color: #007bff;
   transition: background-color 0.3s ease;
 }
 
-.submit-button:hover {
-  background-color: #3367d6; /* Blu più scuro al passaggio del mouse */
+.registration-form .btn-primary:hover {
+  background-color: #0069d9;
 }
 
-/* Pulsante Google */
-.google-login-button {
-  /* Puoi personalizzare ulteriormente lo stile del pulsante Google qui */
+.registration-form .form-text.text-muted {
+  font-size: 0.875em;
 }

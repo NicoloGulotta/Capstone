@@ -1,79 +1,78 @@
+/* file Login.css */
 .login-form {
-  width: 400px; /* Larghezza massima */
-  margin: 100px auto; /* Centra il form */
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centra il contenuto orizzontalmente */
+  justify-content: center; /* Centra il contenuto verticalmente */
+  /* Assicura che il form occupi tutta l'altezza della viewport */
+  background-color: #f5f5f5; /* Sfondo grigio chiaro */
+  padding: 20px;
 }
 
-/* Contenitore principale del form */
-.login-container {
-  background-color: #fff; /* Sfondo bianco per contrasto */
-  padding: 40px;
-  border-radius: 8px; /* Bordi più arrotondati */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Ombra leggera */
-  width: 350px; /* Larghezza leggermente maggiore */
-}
-
-/* Titolo del form */
-.login-title {
-  text-align: center;
-  margin-bottom: 30px;
-  font-size: 24px; /* Titolo più grande */
-  color: #333; /* Testo grigio scuro */
-}
-
-/* Stili per i gruppi di input */
-.form-group {
+.login-form h2 {
   margin-bottom: 20px;
+  font-size: 2em;
+  color: #333; /* Colore del titolo */
+  text-align: center; /* Centra il titolo */
 }
 
-.form-label {
-  font-weight: bold;
-  display: block; /* Assicura che le label occupino l'intera riga */
-}
-
-/* Stili per gli input */
-.form-control {
+.login-form form {
+  /* Aggiunto selettore per il form */
+  display: flex;
+  flex-direction: column;
   width: 100%;
+  max-width: 400px;
+  padding: 20px; /* Aggiunto padding al form */
+  border-radius: 8px;
+  background-color: #fff; /* Sfondo bianco per il form */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Ombra più evidente */
+}
+
+.login-form .form-group {
+  margin-bottom: 1px;
+}
+
+.login-form .form-group {
+  width: 70%; /* Rendi i campi di input a larghezza intera */
+  max-width: 400px; /* Limita la larghezza massima del form */
+  margin-bottom: 15px;
+}
+
+.login-form .form-control {
+  padding: 15px; /* Aumenta la padding interna */
+  border-radius: 8px; /* Angoli arrotondati */
+  border: 1px solid #ccc; /* Bordo grigio chiaro */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Ombra leggera */
+}
+
+.login-form .form-label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.login-form .btn-primary {
+  width: 50%;
   padding: 10px;
-  border: 1px solid #ced4da; /* Bordo più sottile */
-  border-radius: 5px;
-  box-sizing: border-box;
-  font-size: 16px;
+  border-radius: 8px;
+  background-color: #007bff; /* Colore primario */
+  border-color: #007bff;
+  transition: background-color 0.3s ease; /* Transizione per il colore di sfondo */
 }
 
-.form-control:focus {
-  border-color: #4285f4;
-  outline: none;
-  box-shadow: 0 0 0 0.2rem rgba(66, 133, 244, 0.25); /* Ombra leggera al focus */
+.login-form .btn-primary:hover {
+  background-color: #0069d9; /* Colore più scuro al passaggio del mouse */
 }
 
-/* Messaggi di errore */
-.error-message {
-  color: #dc3545; /* Rosso per gli errori */
-  font-size: 14px;
-  margin-top: 5px;
-}
-
-/* Pulsante di login */
-.submit-button {
-  background-color: #4285f4; /* Blu Google */
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  width: 100%; /* Occupa l'intera larghezza del contenitore */
-  font-size: 16px;
-  transition: background-color 0.3s; /* Transizione per il colore di sfondo */
-}
-
-.submit-button:hover {
-  background-color: #3367d6; /* Blu più scuro al passaggio del mouse */
-}
-
-/* Stili per il pulsante Google */
 .google-login-button {
-  /* Stili personalizzati per il pulsante di Google, se necessario */
+  width: 100%;
+  background-color: #4285f4; /* Colore di sfondo Google */
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.google-login-button:hover {
+  background-color: #3367d6; /* Colore più scuro al passaggio del mouse */
 }
