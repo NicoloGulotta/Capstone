@@ -1,70 +1,45 @@
-# Getting Started with Create React App
+E-commerce con Prenotazioni - Progetto Finale MERN
+Studente: Nicolò Gulotta
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Descrizione
+Questo progetto si propone di sviluppare una piattaforma e-commerce completa, integrata con un sistema di prenotazione appuntamenti, utilizzando lo stack tecnologico MERN (MongoDB, Express.js, React, Node.js). L'obiettivo è fornire una soluzione end-to-end per la vendita di prodotti e servizi, offrendo un'esperienza utente ottimizzata e funzionalità di gestione avanzate per l'amministratore.
 
-## Available Scripts
+Obiettivi e Funzionalità Principali
+Il progetto mira a raggiungere i seguenti obiettivi:
 
-In the project directory, you can run:
+Esperienza utente intuitiva: L'interfaccia utente sarà progettata per essere user-friendly e responsive, garantendo una navigazione fluida e un processo di acquisto/prenotazione semplice ed efficiente.
+Gestione completa del catalogo: L'amministratore avrà a disposizione strumenti per gestire in modo autonomo il catalogo prodotti/servizi, inclusi l'aggiunta, la modifica e l'eliminazione di voci.
+Sistema di prenotazione appuntamenti integrato: La piattaforma includerà un sistema di prenotazione appuntamenti personalizzabile, consentendo ai clienti di selezionare servizi e orari disponibili in base alle proprie esigenze.
+Moduli personalizzati per la raccolta dati: Saranno implementati moduli personalizzabili per raccogliere informazioni specifiche dai clienti durante il processo di acquisto o prenotazione.
+Architettura Tecnologica
+Il progetto sarà sviluppato utilizzando lo stack MERN:
 
-### `npm start`
+Frontend:
+React: Libreria JavaScript per la creazione di interfacce utente componentizzate.
+React Bootstrap: Framework CSS per lo styling e il layout dell'interfaccia.
+Font Awesome: Libreria di icone per arricchire l'interfaccia utente.
+Backend:
+Node.js: Ambiente di runtime JavaScript per l'esecuzione del codice server-side.
+Express.js: Framework web minimalista per Node.js, utilizzato per la creazione di API RESTful.
+Database:
+MongoDB: Database NoSQL orientato ai documenti, scelto per la sua flessibilità e scalabilità.
+Autenticazione e Autorizzazione:
+JSON Web Tokens (JWT): Standard aperto per la creazione di token di accesso sicuri.
+Altre tecnologie (potenziali):
+Stripe/PayPal: Integrazione di gateway di pagamento per gestire le transazioni online.
+Librerie di calendario: Per la visualizzazione e la selezione degli appuntamenti.
+Fasi di Sviluppo
+Il progetto sarà suddiviso in diverse fasi:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Progettazione e prototipazione: Definizione dettagliata dei requisiti, creazione di wireframe e mockup dell'interfaccia utente.
+Sviluppo del backend: Implementazione delle API RESTful per la gestione del catalogo, degli ordini, degli appuntamenti e dei clienti.
+Sviluppo del frontend: Creazione dei componenti React per l'interfaccia utente, integrazione con le API del backend.
+Implementazione dell'autenticazione e autorizzazione: Configurazione dell'autenticazione basata su JWT per proteggere le risorse e gestire le autorizzazioni degli utenti.
+Integrazione del sistema di prenotazione: Sviluppo e integrazione del sistema di prenotazione degli appuntamenti.
+Testing e ottimizzazione: Test approfonditi per garantire la funzionalità, l'usabilità e la sicurezza dell'applicazione. Ottimizzazione delle prestazioni e del codice.
+Deployment: Distribuzione dell'applicazione su un ambiente di produzione.
+Licenza
+[Specifica la licenza che intendi utilizzare (ad esempio, MIT)]
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Contatti
+Nicolò Gulotta - gulottanico1998@gmail.com

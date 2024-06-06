@@ -136,7 +136,7 @@ function Profile() {
                         <Button
                             variant="primary"
                             className="mb-3"
-                            onClick={() => navigate("/book-appointment")}
+                            onClick={() => navigate("/")}
                         >
                             Prenota un nuovo appuntamento
                         </Button>

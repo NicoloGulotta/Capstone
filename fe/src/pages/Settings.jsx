@@ -7,69 +7,109 @@ import { useFetchUserData } from '../data/useFetchUserData';
 import { AuthContext } from '../context/AuthContext';
 
 function Settings() {
-    // Ottiene dati e funzioni dal custom hook useFetchUserData
-    const { user, isLoading, error, updateUser, deleteUser, refetchUserData, setIsLoading, setError } = useFetchUserData();
-
-    // Stati locali per gestire il form, messaggi e visualizzazione password
+    const { user, isLoading, error, setIsLoading, setError, refetchUserData } = useFetchUserData();
+    const API_BASE_URL = "http://localhost:3001/auth";
     const [formData, setFormData] = useState({ password: '', confirmPassword: '' });
     const [success, setSuccess] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [showModal, setShowModal] = useState(false);
 
-    // Hook per la navigazione
     const navigate = useNavigate();
-
-    // Ottiene funzioni di autenticazione dal contesto
-    const { isAuthenticated } = useContext(AuthContext);
     const { logout } = useContext(AuthContext);
+    // Funzione per aggiornare i dati dell'utente (integrata nel componente)
+    const updateUser = async (formData) => {
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        if (storedUser && storedUser.token) {
+            const response = await fetch(`${API_BASE_URL}/settings`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${storedUser.token}`,
+                },
+                body: JSON.stringify(formData),
+            });
 
-    // Effetto per inizializzare il form con i dati utente
+            if (response.ok) {
+                return response.json();
+            } else {
+                const errorData = await response.json();
+                throw new Error(errorData.message || "Errore durante l'aggiornamento del profilo");
+            }
+        } else {
+            throw new Error("Utente non autenticato");
+        }
+    };
+
+    // Funzione per eliminare l'account dell'utente (integrata nel componente)
+    const deleteUser = async () => {
+        const storedUser = localStorage.getItem("user");
+        const storedToken = localStorage.getItem("token");
+        console.log(storedUser);
+        console.log(storedToken);
+        if (storedUser && storedToken) {
+            const response = await fetch(`${API_BASE_URL}/delete-account`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${storedToken}` },
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || "Errore durante la cancellazione dell'account");
+            }
+        } else {
+            throw new Error("Utente non autenticato"); // Lancia un errore esplicito
+        }
+    };
     useEffect(() => {
         if (user) {
             setFormData({
                 name: user.name || "",
                 surname: user.surname || "",
                 email: user.email || "",
-                password: "", // Start with empty password fields
+                password: "",
                 confirmPassword: "",
             });
         }
-    }, [user]);// Dipende da user per rieseguire se cambia
+    }, [user]);
 
-    // Gestisce i cambiamenti nei campi del form
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    // Gestisce l'invio del form
     const handleSubmit = async (e) => {
-        e.preventDefault(); // Previene il refresh della pagina
-        setIsLoading(true); // Imposta lo stato di caricamento
-        setError(null); // Pulisce eventuali errori precedenti
-        setSuccess(false); // Pulisce eventuali messaggi di successo precedenti
+        e.preventDefault();
+        setIsLoading(true);
+        setError(null);
+        setSuccess(false);
 
         try {
-            await updateUser(formData); // Aggiorna i dati utente
-            await refetchUserData(); // Ricarica i dati utente aggiornati
-            setSuccess('Profilo aggiornato con successo!'); // Imposta il messaggio di successo
-            setTimeout(() => {
-                setSuccess(false); // Nasconde il messaggio di successo dopo 3 secondi
-            }, 3000);
+            // Verifica se la password è stata modificata
+            if (formData.password && formData.password === formData.confirmPassword) {
+                await updateUser(formData);
+            } else if (formData.password || formData.confirmPassword) {
+                throw new Error('Le password non corrispondono o un campo è vuoto.');
+            } else {
+                // Aggiorna solo i dati senza password
+                await updateUser({ name: formData.name, surname: formData.surname, email: formData.email });
+            }
+
+            await refetchUserData();
+            setSuccess('Profilo aggiornato con successo!');
+            setTimeout(() => setSuccess(false), 3000);
         } catch (error) {
-            setError(error.message || 'Errore durante l\'aggiornamento del profilo.'); // Gestisce gli errori
+            setError(error.message || 'Errore durante l\'aggiornamento del profilo.');
         } finally {
-            setIsLoading(false); // Reimposta lo stato di caricamento
+            setIsLoading(false);
         }
     };
 
-    // Gestisce l'eliminazione dell'account
     const handleDeleteAccount = async () => {
         const confirmDelete = window.confirm('Sei sicuro di voler cancellare il tuo account? Questa azione è irreversibile.');
-        if (confirmDelete && isAuthenticated) {
+        if (confirmDelete) {
             try {
                 setIsLoading(true);
-                await deleteUser(); // Elimina l'account
+                await deleteUser(); // Chiama la funzione deleteUser
                 logout(); // Effettua il logout
                 navigate('/'); // Reindirizza alla home
             } catch (error) {
@@ -79,7 +119,6 @@ function Settings() {
             }
         }
     };
-
     // Funzioni per mostrare/nascondere le password
     const toggleShowPassword = () => setShowPassword(!showPassword);
     const toggleShowConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
@@ -96,7 +135,7 @@ function Settings() {
                     <span className="visually-hidden">Loading...</span>
                 </Spinner>
             </div>
-        ); // Show loading indicator while fetching user data
+        );
     }
 
     if (error) {
@@ -120,13 +159,13 @@ function Settings() {
                         <Form.Control type="text" name="surname" value={formData.surname} onChange={handleChange} required />
                     </Form.Group>
 
-                    <Form.Group controlId="formEmail">
+                    <Form.Group controlId="formEmail" className='mb-3'>
                         <Form.Label>Email</Form.Label>
                         <Form.Control type="email" name="email" value={formData.email} onChange={handleChange} required />
                     </Form.Group>
 
                     {/* Password Fields (with show/hide functionality) */}
-                    <InputGroup className="mb-3">
+                    <InputGroup >
                         <FormControl
                             type={showPassword ? 'text' : 'password'}
                             name="password"
@@ -155,12 +194,12 @@ function Settings() {
                     <Button variant="outline-dark" type="submit" disabled={isLoading}>
                         {isLoading ? 'Salvataggio...' : 'Salva Modifiche'}
                     </Button>
-                </Form>
 
-                {/* Delete Account Button */}
-                <Button variant="danger" className="my-3" onClick={handleShowModal}>
-                    <FontAwesomeIcon icon={faTrashAlt} className="me-2" /> Cancella Account
-                </Button>
+                    {/* Delete Account Button */}
+                    <Button variant="danger" className="m-3" onClick={handleShowModal}>
+                        <FontAwesomeIcon icon={faTrashAlt} className="me-2" /> Cancella Account
+                    </Button>
+                </Form>
             </div>
 
             {/* Delete Account Modal */}
@@ -168,9 +207,6 @@ function Settings() {
                 <Modal.Header closeButton>
                     <Modal.Title>Conferma Cancellazione Account</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>
-                    Sei sicuro di voler cancellare il tuo account? Questa azione è irreversibile.
-                </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleCloseModal}>
                         Annulla
