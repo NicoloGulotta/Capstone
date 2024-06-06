@@ -1,12 +1,12 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFacebook, faTwitter, faInstagram, faLinkedin } from '@fortawesome/free-brands-svg-icons'; // Importa le icone che vuoi usare
+import { faFacebook, faTwitter, faInstagram, faLinkedin } from '@fortawesome/free-brands-svg-icons';
 import '../../styles/Footer.css';
 const Footer = () => {
 
 
     return (
-        <footer className="bg-dark text-white py-4">
+        <footer className="bg-dark text-white py-4 mt-5 fix-bottom">
             <div className="container">
                 <div className="row">
                     <div className="col-md-4">

@@ -1,6 +1,78 @@
+/* Stile di base del footer */
+footer.fix-bottom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #f8f9fa;
+  padding: 20px 0;
+  text-align: center;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.9;
+  padding: 15px 0;
+  transition: opacity 0.3s ease;
+}
+
+footer.fix-bottom:hover {
+  opacity: 1;
+}
+
+/* Stili per le icone social */
 .social-icons a {
-  margin-right: 10px;
+  margin: 0 15px;
   display: inline-block;
-  font-size: 15px;
+  text-decoration: none;
+}
+
+.social-icons svg {
+  width: 30px;
+  height: 30px;
   color: #2a4291;
+  transition: all 0.2s ease;
+}
+
+.social-icons svg:hover {
+  transform: scale(1.2);
+  opacity: 0.8;
+}
+
+/* Media query per schermi grandi (desktop) */
+@media (min-width: 992px) {
+  footer.fix-bottom {
+    padding: 25px 0;
+  }
+}
+
+/* Media query per schermi medi (tablet landscape) */
+@media (max-width: 992px) and (min-width: 768px) {
+  .social-icons svg {
+    width: 25px;
+    height: 25px;
+  }
+
+  .social-icons a {
+    margin: 0 10px;
+  }
+}
+
+/* Media query per schermi piccoli (tablet portrait) */
+@media (max-width: 768px) and (min-width: 576px) {
+  footer.fix-bottom {
+    padding: 20px 0;
+  }
+}
+
+/* Media query per schermi molto piccoli (smartphone) */
+@media (max-width: 576px) {
+  footer.fix-bottom {
+    padding: 15px 0;
+  }
+
+  .social-icons svg {
+    width: 20px;
+    height: 20px;
+  }
 }

@@ -22,6 +22,9 @@
   flex-direction: column;
   width: 100%;
   max-width: 400px;
+  margin: 0 auto;
+  border: 1px solid #ccc;
+  height: auto;
   padding: 20px; /* Aggiunto padding al form */
   border-radius: 8px;
   background-color: #fff; /* Sfondo bianco per il form */
