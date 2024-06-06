@@ -18,7 +18,7 @@ function Servizi() {
           throw new Error('Errore nella risposta dal server');
         }
         const data = await response.json();
-        console.log(data);
+        // console.log(data);
         if (Array.isArray(data)) {
           setServizi(data);
         } else {
@@ -64,13 +64,14 @@ function Servizi() {
                 <Col key={servizio._id} xs={12} sm={6} md={3} lg={4} className="mb-4">
                   <Card className="mb-2" body style={{ padding: "0.5rem" }} onClick={() => navigate(`post/${servizio._id}`)}>
                     <Card.Img variant="top" src={servizio.cover} alt={servizio.title} style={{ maxHeight: "300px", objectFit: "cover" }} />
-                    <Card.Body>
-                      <Card.Title style={{ maxHeight: "3em", overflow: "hidden", textOverflow: "ellipsis" }}>{servizio.title}</Card.Title>
-                      <Button variant="primary" size="sm" onClick={() => navigate(`post/${servizio._id}`)}>
-                        Prenota
+                    <Card.Body className='text-center'>
+                      <Card.Title>{servizio.title}</Card.Title>
+                      <Button variant="outline-dark" size="sm" onClick={() => navigate(`post/${servizio._id}`)}>
+                        Scopri
                       </Button>
                     </Card.Body>
                   </Card>
+                  {/* <p>{servizio.content}</p> */}
                 </Col>
               ))}
             </Row>

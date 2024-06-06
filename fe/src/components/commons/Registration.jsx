@@ -147,7 +147,7 @@ function RegistrationForm() {
                 />
               </Form.Group>
 
-              <Button type="submit" variant="primary" className="my-3">
+              <Button type="submit" variant="outline-dark" className="my-3">
                 Registrati
               </Button>
             </Form>

@@ -5,7 +5,7 @@ import { AuthContext } from "../../context/AuthContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import "../../styles/Login.css";
-
+// import clientSecret from '../../../client_secret_425501205097-jqtltmu1sr9u6ib95s8qm2hna64afj5a.apps.googleusercontent.com.json';
 function Login() {
     // Stato per gestire i dati del form di login
     const [formData, setFormData] = useState({ email: "", password: "" });
@@ -60,20 +60,16 @@ function Login() {
         setShowPassword((prevState) => !prevState);
     };
 
-    // Funzione per gestire il login con Google
-    const handleGoogleLogin = async () => {
-        try {
-            const response = await fetch("http://localhost:3001/auth/google"); // Richiesta al backend
-            if (response.ok) {
-                // Il backend dovrebbe reindirizzare a Google, quindi non è necessario fare altro qui
-            } else {
-                // Gestisci eventuali errori dal backend (ad esempio, se la rotta non esiste)
-                console.error("Errore durante la richiesta di login con Google:", response.statusText);
-            }
-        } catch (err) {
-            console.error("Errore di rete durante la richiesta di login con Google:", err.message);
-        }
+    const handleGoogleLogin = () => {
+        const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?
+          response_type=code&
+          client_id=425501205097-jqtltmu1sr9u6ib95s8qm2hna64afj5a.apps.googleusercontent.com&
+          scope=profile%20email&
+          redirect_uri=http://localhost:3001/google/callback`;
+
+        window.location.href = authUrl;
     };
+
 
     return (
         <div className="login-form">
@@ -106,22 +102,22 @@ function Login() {
                             required
                         />
                         <div className="input-group-append align-self-center">
-                            <Button variant="outline-secondary" onClick={togglePasswordVisibility}>
+                            <Button variant="outline-dark" className="ms-2" onClick={togglePasswordVisibility}>
                                 <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                             </Button>
                         </div>
                     </div>
                 </Form.Group>
 
-                <Button variant="primary" type="submit" className="my-3">
+                <Button variant="outline-dark" type="submit" className="my-3">
                     Login
+                </Button>
+                {/* Pulsante per il login con Google */}
+                <Button variant="outline-primary" onClick={handleGoogleLogin} className="my-2">
+                    Accedi con Google
                 </Button>
             </Form>
 
-            {/* Pulsante per il login con Google */}
-            <Button variant="outline-primary" onClick={handleGoogleLogin} className="my-2">
-                Accedi con Google
-            </Button>
         </div>
     );
 }

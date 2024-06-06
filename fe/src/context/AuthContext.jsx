@@ -10,6 +10,7 @@ export const AuthContext = createContext({
     error: null,
     setError: () => { },
     updateUser: (updatedUserData) => { },
+    refetchUserData: () => { },
 });
 
 export const AuthProvider = ({ children }) => {
@@ -61,10 +62,39 @@ export const AuthProvider = ({ children }) => {
         navigate("/");
     };
 
+    // Refetch User Data Function
+    const refetchUserData = async () => {
+        try {
+            const storedUser = JSON.parse(localStorage.getItem("user"));
+            if (storedUser && storedUser.token) {
+                const response = await fetch("http://localhost:3001/auth/profile", {
+                    headers: { Authorization: `Bearer ${storedUser.token}` },
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setUser(data); // Update user state
+                    return data; // Return the updated user data
+                } else {
+                    throw new Error("Failed to refetch user data");
+                }
+            }
+        } catch (error) {
+            setError("Error refetching user data: " + error.message);
+            throw error; // Rethrow the error to be handled by the calling component
+        }
+    };
+
     // Update User Data Function
-    const updateUser = (updatedUserData) => {
-        setUser(prevUser => ({ ...prevUser, ...updatedUserData }));
-        localStorage.setItem("user", JSON.stringify({ ...user, ...updatedUserData }));
+    const updateUser = async (updatedUserData) => {
+        try {
+            const updatedUser = await refetchUserData();
+            setUser(prevUser => ({ ...prevUser, ...updatedUserData }));
+            localStorage.setItem("user", JSON.stringify(updatedUser));
+        } catch (error) {
+            // Handle errors that occur during the refetch or update
+            setError(error.message);
+        }
     };
 
     return (
@@ -77,7 +107,8 @@ export const AuthProvider = ({ children }) => {
                 logout,
                 error,
                 setError,
-                updateUser,
+                refetchUserData, // Add refetchUserData to the context value
+                updateUser, // Add updateUser to the context value
             }}
         >
             {children}

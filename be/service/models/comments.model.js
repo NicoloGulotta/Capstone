@@ -4,22 +4,27 @@ const commentSchema = new Schema(
     {
         text: {
             type: String,
-            required: true
+            required: true,
         },
         author: {
             type: Schema.Types.ObjectId,
-            ref: "User"
+            ref: "User",
         },
         post: {
             type: Schema.Types.ObjectId,
-            ref: "Post"
-        }
+            ref: "Post",
+        },
+        rating: {  // Nuovo campo per la valutazione
+            type: Number,
+            min: 1,
+            max: 5,
+            required: true, // O potrebbe essere opzionale, a seconda dei requisiti
+        },
     },
     {
         collection: "Comments",
-        timestamps: true
+        timestamps: true,
     }
 );
 
 export default model("Comment", commentSchema);
-

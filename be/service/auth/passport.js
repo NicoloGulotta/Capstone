@@ -8,7 +8,7 @@ import { generateJWT } from "./auth.js";
 const googleConfig = {
     clientID: process.env.REACT_APP_G_CLIENT_ID,
     clientSecret: process.env.G_CLIENT_SECRET,
-    callbackURL: process.env.G_CALLBACK_URL,
+    callbackURL: 'http://localhost:3001/google/callback'
 };
 //console.log(googleConfig);
 // Strategia di autenticazione Google

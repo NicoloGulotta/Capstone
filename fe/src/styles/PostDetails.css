@@ -13,8 +13,8 @@
   margin-top: 20px;
 }
 
-.comment-box {
-  border: 1px solid #ccc;
+.comment-container {
+  border: 1px solid #000000;
   padding: 10px;
   margin-bottom: 10px;
   border-radius: 5px;
@@ -23,4 +23,10 @@
 .comment-author {
   font-weight: bold;
   margin-bottom: 5px;
+}
+.comment-author img {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-right: 5px;
 }

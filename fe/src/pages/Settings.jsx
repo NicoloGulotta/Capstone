@@ -1,167 +1,188 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { AuthContext } from '../context/AuthContext';
-import { Form, Button, Alert, InputGroup, FormControl } from 'react-bootstrap';
-import validator from 'validator';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-function Settings() {
-    const { user, token, updateUser, logout } = useContext(AuthContext);
-    const navigate = useNavigate(); // hook per la navigazione
+import { Form, Button, Alert, InputGroup, FormControl, Modal, Spinner } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import { useFetchUserData } from '../data/useFetchUserData';
+import { AuthContext } from '../context/AuthContext';
 
-    // Stati per la visibilità delle password
+function Settings() {
+    // Ottiene dati e funzioni dal custom hook useFetchUserData
+    const { user, isLoading, error, updateUser, deleteUser, refetchUserData, setIsLoading, setError } = useFetchUserData();
+
+    // Stati locali per gestire il form, messaggi e visualizzazione password
+    const [formData, setFormData] = useState({ password: '', confirmPassword: '' });
+    const [success, setSuccess] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [showModal, setShowModal] = useState(false);
 
-    // Stato per i dati del form, inizializzato con i dati dell'utente
-    const [formData, setFormData] = useState({
-        name: user?.name || '',
-        surname: user?.surname || '',
-        email: user?.email || '',
-        password: '',
-        confirmPassword: '',
-    });
+    // Hook per la navigazione
+    const navigate = useNavigate();
 
-    const [isLoading, setIsLoading] = useState(false);
-    const [success, setSuccess] = useState(false);
-    const [error, setError] = useState(null);
+    // Ottiene funzioni di autenticazione dal contesto
+    const { isAuthenticated } = useContext(AuthContext);
+    const { logout } = useContext(AuthContext);
 
-    // Aggiorna i dati del form se i dati dell'utente cambiano
+    // Effetto per inizializzare il form con i dati utente
     useEffect(() => {
-        setFormData({
-            name: user?.name || '',
-            surname: user?.surname || '',
-            email: user?.email || ''
-        });
-    }, [user]);
+        if (user) {
+            setFormData({
+                name: user.name || "",
+                surname: user.surname || "",
+                email: user.email || "",
+                password: "", // Start with empty password fields
+                confirmPassword: "",
+            });
+        }
+    }, [user]);// Dipende da user per rieseguire se cambia
 
-    // Funzione per gestire le modifiche ai campi del form
-    const handleChange = (event) => {
-        setFormData({
-            ...formData,
-            [event.target.name]: event.target.value,
-        });
+    // Gestisce i cambiamenti nei campi del form
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    // Funzione per gestire l'invio del form
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        navigate('/profile');
-        // 1. Validazione dell'input (includi la validazione della password)
-        if (!formData.name || !formData.surname || !formData.email) {
-            return setError('Nome, cognome ed email sono obbligatori.');
-        }
-        if (!validator.isEmail(formData.email)) {
-            return setError('Inserisci un indirizzo email valido.');
-        }
-
-        // Validazione della password (solo se modificata)
-        if (formData.password || formData.confirmPassword) {
-            if (formData.password !== formData.confirmPassword) {
-                return setError('Le password non corrispondono.');
-            }
-            if (formData.password.length < 8) {
-                return setError('La password deve essere di almeno 8 caratteri.');
-            }
-        }
-
-        setIsLoading(true);
+    // Gestisce l'invio del form
+    const handleSubmit = async (e) => {
+        e.preventDefault(); // Previene il refresh della pagina
+        setIsLoading(true); // Imposta lo stato di caricamento
+        setError(null); // Pulisce eventuali errori precedenti
+        setSuccess(false); // Pulisce eventuali messaggi di successo precedenti
 
         try {
-            const response = await fetch('http://localhost:3001/auth/settings', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(formData),
-            });
-
-            if (response.ok) {
-                const updatedUserData = await response.json();
-                updateUser(updatedUserData);
-                setSuccess(true);
-                setTimeout(() => {
-                    setSuccess(false);
-                }, 3000);
-            } else {
-                const errorData = await response.json();
-                setError(errorData.message || 'Errore durante l\'aggiornamento del profilo');
-            }
+            await updateUser(formData); // Aggiorna i dati utente
+            await refetchUserData(); // Ricarica i dati utente aggiornati
+            setSuccess('Profilo aggiornato con successo!'); // Imposta il messaggio di successo
+            setTimeout(() => {
+                setSuccess(false); // Nasconde il messaggio di successo dopo 3 secondi
+            }, 3000);
         } catch (error) {
-            setError('Errore di rete durante l\'aggiornamento del profilo');
+            setError(error.message || 'Errore durante l\'aggiornamento del profilo.'); // Gestisce gli errori
         } finally {
-            setIsLoading(false);
+            setIsLoading(false); // Reimposta lo stato di caricamento
         }
     };
 
-    // Funzioni per mostrare/nascondere la password
+    // Gestisce l'eliminazione dell'account
+    const handleDeleteAccount = async () => {
+        const confirmDelete = window.confirm('Sei sicuro di voler cancellare il tuo account? Questa azione è irreversibile.');
+        if (confirmDelete && isAuthenticated) {
+            try {
+                setIsLoading(true);
+                await deleteUser(); // Elimina l'account
+                logout(); // Effettua il logout
+                navigate('/'); // Reindirizza alla home
+            } catch (error) {
+                setError(error.message || 'Errore durante la cancellazione dell\'account.');
+            } finally {
+                setIsLoading(false);
+            }
+        }
+    };
+
+    // Funzioni per mostrare/nascondere le password
     const toggleShowPassword = () => setShowPassword(!showPassword);
     const toggleShowConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
 
+    // Funzioni per gestire la finestra modale di conferma eliminazione
+    const handleCloseModal = () => setShowModal(false);
+    const handleShowModal = () => setShowModal(true);
+
+    // Conditional Rendering
+    if (isLoading) {
+        return (
+            <div className="d-flex justify-content-center align-items-center vh-100">
+                <Spinner animation="border" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </Spinner>
+            </div>
+        ); // Show loading indicator while fetching user data
+    }
+
+    if (error) {
+        return <Alert variant="danger">{error}</Alert>; // Show error message if there's an error
+    }
     return (
-        <div className="container mt-5">
-            <h2>Impostazioni Profilo</h2>
-            {success && <Alert variant="success">Profilo aggiornato con successo!</Alert>}
-            {error && <Alert variant="danger">{error}</Alert>}
-            <Form onSubmit={handleSubmit}>
-                {/* Altri campi del modulo per cognome, email, ecc. */}
-                <Form.Group controlId="formName">
-                    <Form.Label>Nome</Form.Label>
-                    <Form.Control type="text" name="name" value={formData.name} onChange={handleChange} required />
-                </Form.Group>
+        <div>
+            <div className="container mt-5">
+                <h2>Impostazioni Profilo</h2>
+                {success && <Alert variant="success">{success}</Alert>}
+                {error && <Alert variant="danger">{error}</Alert>}
 
-                <Form.Group controlId="formSurname">
-                    <Form.Label>Cognome</Form.Label>
-                    <Form.Control type="text" name="surname" value={formData.surname} onChange={handleChange} required />
-                </Form.Group>
+                <Form onSubmit={handleSubmit}>
+                    <Form.Group controlId="formName">
+                        <Form.Label>Nome</Form.Label>
+                        <Form.Control type="text" name="name" value={formData.name} onChange={handleChange} required />
+                    </Form.Group>
 
-                <Form.Group controlId="formEmail">
-                    <Form.Label>Email</Form.Label>
-                    <Form.Control type="email" name="email" value={formData.email} onChange={handleChange} required />
-                </Form.Group>
+                    <Form.Group controlId="formSurname">
+                        <Form.Label>Cognome</Form.Label>
+                        <Form.Control type="text" name="surname" value={formData.surname} onChange={handleChange} required />
+                    </Form.Group>
 
-                {/* Campi per la password */}
-                <InputGroup className="mb-3">
-                    <FormControl
-                        type={showPassword ? 'text' : 'password'}
-                        name="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        placeholder="Nuova password"
-                        aria-label="Nuova password"
-                        aria-describedby="basic-addon2"
-                    />
-                    <Button variant="outline-secondary" onClick={toggleShowPassword}>
-                        <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                    <Form.Group controlId="formEmail">
+                        <Form.Label>Email</Form.Label>
+                        <Form.Control type="email" name="email" value={formData.email} onChange={handleChange} required />
+                    </Form.Group>
+
+                    {/* Password Fields (with show/hide functionality) */}
+                    <InputGroup className="mb-3">
+                        <FormControl
+                            type={showPassword ? 'text' : 'password'}
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            placeholder="Nuova password"
+                        />
+                        <Button variant="outline-secondary" onClick={toggleShowPassword}>
+                            <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                        </Button>
+                    </InputGroup>
+
+                    <InputGroup className="mb-3">
+                        <FormControl
+                            type={showConfirmPassword ? 'text' : 'password'}
+                            name="confirmPassword"
+                            value={formData.confirmPassword}
+                            onChange={handleChange}
+                            placeholder="Conferma password"
+                        />
+                        <Button variant="outline-secondary" onClick={toggleShowConfirmPassword}>
+                            <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} />
+                        </Button>
+                    </InputGroup>
+
+                    <Button variant="outline-dark" type="submit" disabled={isLoading}>
+                        {isLoading ? 'Salvataggio...' : 'Salva Modifiche'}
                     </Button>
-                </InputGroup>
+                </Form>
 
-                <InputGroup className="mb-3">
-                    <FormControl
-                        type={showConfirmPassword ? 'text' : 'password'}
-                        name="confirmPassword"
-                        value={formData.confirmPassword}
-                        onChange={handleChange}
-                        placeholder="Conferma password"
-                        aria-label="Conferma password"
-                        aria-describedby="basic-addon2"
-                    />
-                    <Button variant="outline-secondary" onClick={toggleShowConfirmPassword}>
-                        <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} />
+                {/* Delete Account Button */}
+                <Button variant="danger" className="my-3" onClick={handleShowModal}>
+                    <FontAwesomeIcon icon={faTrashAlt} className="me-2" /> Cancella Account
+                </Button>
+            </div>
+
+            {/* Delete Account Modal */}
+            <Modal show={showModal} onHide={handleCloseModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Conferma Cancellazione Account</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Sei sicuro di voler cancellare il tuo account? Questa azione è irreversibile.
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseModal}>
+                        Annulla
                     </Button>
-                </InputGroup>
-
-                {/* Bottone di salvataggio */}
-                <Button variant="primary" type="submit" disabled={isLoading}>
-                    {isLoading ? 'Salvataggio...' : 'Salva Modifiche'}
-                </Button>
-                <Button variant="danger" className="m-3 ms-3" onClick={logout}>
-                    Logout
-                </Button>
-            </Form>
+                    <Button variant="danger" onClick={handleDeleteAccount} disabled={isLoading}>
+                        {isLoading ? 'Cancellazione...' : 'Conferma Cancellazione'}
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 }
+
 
 export default Settings;

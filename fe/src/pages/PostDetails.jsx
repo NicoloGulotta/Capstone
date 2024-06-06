@@ -3,9 +3,11 @@ import { useParams } from "react-router-dom";
 import { Container, Card, Spinner, Alert, Form, Button } from "react-bootstrap";
 import AppointmentForm from "./AppointmentForm";
 import { AuthContext } from "../context/AuthContext";
-import "./../styles/PostDetails.css";
-import Comment from "./Comments";
-
+import "./../styles/PostDetails.css"; // Importa il CSS personalizzato
+import Rating from "react-rating-stars-component";
+import { parseISO, format } from "date-fns"; // Import parseISO and format
+import it from "date-fns/locale/it";
+import { useNavigate } from "react-router-dom";
 function PostDetails() {
     const { postId } = useParams();
     const [post, setPost] = useState(null);
@@ -14,6 +16,7 @@ function PostDetails() {
     const { user, isAuthenticated, token } = useContext(AuthContext);
     const [comments, setComments] = useState([]);
     const [newCommentText, setNewCommentText] = useState("");
+    const [newCommentRating, setNewCommentRating] = useState(0);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -44,13 +47,13 @@ function PostDetails() {
         };
 
         fetchData();
-    }, [postId]); // Dipendenza da postId per aggiornare i commenti se cambia il post
+    }, [postId]);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        if (!newCommentText.trim()) {
-            return; // Non inviare commenti vuoti
+        if (!newCommentText.trim() || newCommentRating === 0) {
+            return; // Non inviare commenti vuoti o senza valutazione
         }
 
         try {
@@ -63,20 +66,24 @@ function PostDetails() {
                 body: JSON.stringify({
                     text: newCommentText,
                     author: user._id,
+                    rating: newCommentRating,
                 }),
             });
 
             if (!response.ok) {
-                throw new Error("Errore nell'invio del commento");
+                throw new Error("Errore nell'invio del commento. Assicurati di aver effettuato l'accesso.");
             }
 
             const newComment = await response.json();
             setComments((prevComments) => [...prevComments, newComment]);
             setNewCommentText("");
+            setNewCommentRating(0);
         } catch (error) {
             console.error("Errore durante l'invio del commento:", error);
+            setError("Si è verificato un errore durante l'invio del commento. Riprova più tardi.");
         }
     };
+    const navigate = useNavigate();
 
     // Rendering condizionale
     if (isLoading) {
@@ -96,6 +103,7 @@ function PostDetails() {
     }
 
     if (!isAuthenticated || !user || !user._id) {
+        navigate("/login");
         return (
             <Container className="mt-5">
                 <Alert variant="warning">
@@ -123,8 +131,8 @@ function PostDetails() {
                     <Card.Text>{post.content}</Card.Text>
                 </Card.Body>
             </Card>
-            <AppointmentForm postId={postId} userId={user._id} />
 
+            <AppointmentForm postId={postId} userId={user._id} />
 
             {user && (
                 <Form onSubmit={handleSubmit}>
@@ -137,25 +145,56 @@ function PostDetails() {
                             onChange={(e) => setNewCommentText(e.target.value)}
                         />
                     </Form.Group>
+                    <Form.Label className="mb-2">Valutazione</Form.Label>
+                    <Rating
+                        name="rating"
+                        size={30}
+                        value={newCommentRating}
+                        onChange={(newRating) => setNewCommentRating(newRating)}
+                        activeColor="#ffd700" // Classic gold for active stars
+                    />
                     <Button variant="dark" className="my-2" type="submit">
                         Invia
                     </Button>
                 </Form>
             )}
+
             <div className="comments-section">
                 <h3>Commenti</h3>
                 {comments.length > 0 ? (
-                    comments.map((comment) => (
-                        <Comment key={comment._id} comment={comment} />
-                    ))
+                    comments.map((comment) => {
+                        // Format the date correctly
+                        const formattedDate = format(parseISO(comment.createdAt), "PPPPp", { locale: it });
+
+                        return (
+                            <div key={comment._id} className="comment-container mb-3">
+                                {comment.author && (
+                                    <div className="comment-author">
+                                        {/* Check if author.avatar exists before rendering */}
+                                        {comment.author.avatar && (
+                                            <img
+                                                className="comment-author-avatar"
+                                                alt={`${comment.author.name}'s avatar`}
+                                                src={comment.author.avatar}
+                                            />
+                                        )}
+                                        <h5>
+                                            {comment.author.name} {comment.author.surname}
+                                        </h5>
+                                    </div>
+                                )}
+                                <p className="mb-0">{comment.text}</p>
+                                <Rating value={comment.rating} edit={false} isHalf={true} />
+                                <span className="comment-date text-muted">Pubblicato: </span>
+                                <span className="text-black-50S">{formattedDate}</span>
+                            </div>
+                        );
+                    })
                 ) : (
-                    <p>Caricamento commenti...</p>
+                    <p>Nessun commento ancora.</p>
                 )}
-
             </div>
-
         </Container>
     );
 }
-
 export default PostDetails;

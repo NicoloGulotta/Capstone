@@ -52,8 +52,15 @@ authRouter.post("/login", async (req, res, next) => {
 authRouter.get("/profile", authMiddleware, async (req, res, next) => {
     try {
         const user = await User.findById(req.user._id)
-            .select("-password -__v") // Escludi password e __v
-            .populate("appointments", "serviceType -_id"); // Popola solo l'ID del serviceType degli appuntamenti
+            .select("name email role appointments")
+            .populate({
+                path: "appointments",
+                select: "serviceType date notes status",
+                populate: {
+                    path: "serviceType",
+                    select: "title"
+                }
+            });
 
         if (!user) {
             return next(createError(404, "Utente non trovato"));
@@ -94,16 +101,42 @@ authRouter.put("/settings", authMiddleware, async (req, res, next) => {
     }
 });
 
-// --- ROTTE GOOGLE AUTH ---
-authRouter.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
 
-authRouter.get(
-    "/google/callback",
-    passport.authenticate("google", { failureRedirect: `${process.env.FRONTEND_URL}/login` }),
+// DELETE /auth/delete-account (Cancellazione account utente)
+authRouter.delete("/delete-account", authMiddleware, async (req, res, next) => {
+    try {
+        const userId = req.user._id;
+
+        // 1. Chiedi conferma all'utente (opzionale ma consigliato)
+        // Puoi farlo dal frontend o qui nel backend, se preferisci un controllo extra
+
+        // 2. Cancella l'utente dal database
+        const deletedUser = await User.findByIdAndDelete(userId);
+
+        if (!deletedUser) {
+            return next(createError(404, "Utente non trovato"));
+        }
+
+        // 3. Revoca il token JWT (importante per invalidare la sessione)
+        // Potresti farlo blacklistando il token o implementando una logica di scadenza forzata
+
+        res.status(204).send(); // 204 No Content (successo senza contenuto da restituire)
+    } catch (error) {
+        next(error);
+    }
+});
+
+// --- ROTTE GOOGLE AUTH ---
+// Inizio dell'autenticazione Google
+authRouter.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+// Callback di Google (dopo l'autenticazione)
+authRouter.get('/google/callback',
+    passport.authenticate('google', { failureRedirect: '/login', session: false }),
     (req, res) => {
-        res.redirect(`${process.env.FRONTEND_URL}`);
+        const token = jwt.sign({ userId: req.user.id }, process.env.JWT_SECRET);
+        res.redirect(`${process.env.FRONTEND_URL}?token=${token}`);
     }
 );
-
 
 export default authRouter;

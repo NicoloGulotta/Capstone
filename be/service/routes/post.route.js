@@ -21,16 +21,22 @@ postRouter.get('/', async (req, res, next) => {
     }
 });
 
-// GET /posts/:postId: Ottieni un post specifico tramite ID
+
+// GET /posts/:postId: Ottieni un post specifico tramite ID (con commenti e rating)
 postRouter.get('/:postId', async (req, res, next) => {
     try {
         if (!mongoose.Types.ObjectId.isValid(req.params.postId)) {
-            return next(createError(400, "ID post non valido")); // Corretto il messaggio di errore
+            return next(createError(400, "ID post non valido"));
         }
 
         const post = await Post.findById(req.params.postId)
-            .populate("comments") // Popola i commenti
-            .lean(); // Usa lean() per ottenere un oggetto JavaScript semplice
+            .populate({
+                path: "comments",
+                populate: {
+                    path: "author", // Popola l'autore di ogni commento
+                },
+            })
+            .lean();
 
         if (!post) {
             return next(createError(404, "Post non trovato"));
