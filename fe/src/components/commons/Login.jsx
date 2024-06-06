@@ -5,7 +5,6 @@ import { AuthContext } from "../../context/AuthContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import "../../styles/Login.css";
-// import clientSecret from '../../../client_secret_425501205097-jqtltmu1sr9u6ib95s8qm2hna64afj5a.apps.googleusercontent.com.json';
 function Login() {
     // Stato per gestire i dati del form di login
     const [formData, setFormData] = useState({ email: "", password: "" });
