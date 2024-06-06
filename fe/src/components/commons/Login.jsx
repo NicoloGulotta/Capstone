@@ -63,7 +63,7 @@ function Login() {
     const handleGoogleLogin = () => {
         const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?
           response_type=code&
-          client_id=425501205097-jqtltmu1sr9u6ib95s8qm2hna64afj5a.apps.googleusercontent.com&
+          client_id=ClientId&
           scope=profile%20email&
           redirect_uri=http://localhost:3001/google/callback`;
 
