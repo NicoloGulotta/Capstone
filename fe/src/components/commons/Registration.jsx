@@ -51,10 +51,10 @@ function RegistrationForm() {
   };
 
   return (
-    <Container className="mt-5 container-fluid">
+    <Container className="mt-5">
       <Row className="justify-content-center">
         <Col xs={12} md={8} lg={6}>
-          <div className="regastration-form">
+          <div className="registration-form">
             <h2 className="text-center mb-4">Registrati</h2>
             {errors.general && <Alert variant="danger">{errors.general}</Alert>}
 
@@ -154,7 +154,7 @@ function RegistrationForm() {
           </div>
         </Col>
       </Row>
-    </Container>
+    </Container >
   );
 }
 

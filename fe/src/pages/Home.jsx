@@ -62,11 +62,11 @@ function Servizi() {
             <Row>
               {servizi.map((servizio) => (
                 <Col key={servizio._id} xs={12} sm={6} md={3} lg={4} className="mb-4">
-                  <Card className="mb-2" body style={{ padding: "0.5rem" }} onClick={() => navigate(`post/${servizio._id}`)}>
+                  <Card className="mb-2 bg-dark" body style={{ padding: "0.5rem" }} onClick={() => navigate(`post/${servizio._id}`)}>
                     <Card.Img variant="top" src={servizio.cover} alt={servizio.title} style={{ maxHeight: "300px", objectFit: "cover" }} />
-                    <Card.Body className='text-center'>
-                      <Card.Title>{servizio.title}</Card.Title>
-                      <Button variant="outline-dark" size="sm" onClick={() => navigate(`post/${servizio._id}`)}>
+                    <Card.Body className='text-center '>
+                      <Card.Title className="text-white">{servizio.title}</Card.Title>
+                      <Button variant="outline-light" size="sm" onClick={() => navigate(`post/${servizio._id}`)}>
                         Scopri
                       </Button>
                     </Card.Body>

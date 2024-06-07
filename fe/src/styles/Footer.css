@@ -1,23 +1,17 @@
 /* Stile di base del footer */
 footer.fix-bottom {
-  position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
-  background-color: #f8f9fa;
-  padding: 20px 0;
   text-align: center;
-  z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.9;
   padding: 15px 0;
-  transition: opacity 0.3s ease;
+  background-color: #333;
 }
-
-footer.fix-bottom:hover {
-  opacity: 1;
+footer.fix-bottom a {
+  text-decoration: none;
 }
 
 /* Stili per le icone social */
@@ -30,7 +24,7 @@ footer.fix-bottom:hover {
 .social-icons svg {
   width: 30px;
   height: 30px;
-  color: #2a4291;
+  color: #ffffff;
   transition: all 0.2s ease;
 }
 

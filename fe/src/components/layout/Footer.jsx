@@ -1,6 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFacebook, faTwitter, faInstagram, faLinkedin } from '@fortawesome/free-brands-svg-icons';
+import { faFacebook, faTwitter, faInstagram } from '@fortawesome/free-brands-svg-icons';
 import '../../styles/Footer.css';
 const Footer = () => {
 
@@ -10,18 +10,18 @@ const Footer = () => {
             <div className="container">
                 <div className="row">
                     <div className="col-md-4">
-                        <h4>Informazioni Legali</h4>
+                        <h4 className="text-white">Informazioni Legali</h4>
                         <ul className="list-unstyled">
-                            <li><a href="/#">Privacy</a></li>
-                            <li><a href="/#">Cookie Preferences</a></li>
-                            <li><a href="/#">Terms of Use</a></li>
+                            <li><a href="/#" className="text-white">Privacy</a></li>
+                            <li><a href="/#" className="text-white">Cookie Preferences</a></li>
+                            <li><a href="/#" className="text-white">Terms of Use</a></li>
                         </ul>
                     </div>
                     <div className="col-md-4">
-                        <h4>Assistenza Clienti</h4>
+                        <h4 className="text-white">Assistenza Clienti</h4>
                         <ul className="list-unstyled">
-                            <li><a href="/#">Contattaci</a></li>
-                            <li><a href="/#">Gift Cards</a></li>
+                            <li><a href="/#" className="text-white">Contattaci</a></li>
+                            <li><a href="/#" className="text-white">Gift Cards</a></li>
                         </ul>
                     </div>
                     <div className="col-md-4">
@@ -36,9 +36,7 @@ const Footer = () => {
                             <a href="https://www.instagram.com/tuoprofiloinstagram" target="_blank" rel="noopener noreferrer">
                                 <FontAwesomeIcon icon={faInstagram} size="2x" /> {/* Icona Instagram */}
                             </a>
-                            <a href="https://www.linkedin.com/in/tuoprofilolinkedin" target="_blank" rel="noopener noreferrer">
-                                <FontAwesomeIcon icon={faLinkedin} size="2x" /> {/* Icona LinkedIn */}
-                            </a>
+
                         </div>
                     </div>
 

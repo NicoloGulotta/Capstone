@@ -18,37 +18,40 @@ function PostDetails() {
     const [newCommentText, setNewCommentText] = useState("");
     const [newCommentRating, setNewCommentRating] = useState(0);
 
+    // Effetto per caricare i dati del post e dei commenti all'avvio
     useEffect(() => {
         const fetchData = async () => {
-            setIsLoading(true);
+            setIsLoading(true); // Mostra l'indicatore di caricamento
 
             try {
-                const postResponse = await fetch(`http://localhost:3001/post/${postId}`);
+                // Carica i dati del post e dei commenti in parallelo
+                const [postResponse, commentsResponse] = await Promise.all([
+                    fetch(`http://localhost:3001/post/${postId}`),
+                    fetch(`http://localhost:3001/post/${postId}/comments`),
+                ]);
+
+                // Gestione degli errori per la risposta del post
                 if (!postResponse.ok) {
                     throw new Error("Post non trovato");
                 }
                 const postData = await postResponse.json();
                 setPost(postData);
 
-                const commentsResponse = await fetch(
-                    `http://localhost:3001/post/${postData._id}/comments`
-                );
+                // Gestione degli errori per la risposta dei commenti
                 if (!commentsResponse.ok) {
                     throw new Error("Errore nel caricamento dei commenti");
                 }
                 const commentsData = await commentsResponse.json();
                 setComments(commentsData);
             } catch (error) {
-                console.error("Errore durante il caricamento:", error);
-                setError(error.message);
+                setError(error.message); // Imposta il messaggio di errore
             } finally {
-                setIsLoading(false);
+                setIsLoading(false); // Nascondi l'indicatore di caricamento
             }
         };
 
-        fetchData();
-    }, [postId]);
-
+        fetchData(); // Chiama la funzione per caricare i dati
+    }, [postId, token]);
     const handleSubmit = async (event) => {
         event.preventDefault();
 
@@ -105,8 +108,8 @@ function PostDetails() {
     if (!isAuthenticated || !user || !user._id) {
         navigate("/login");
         return (
-            <Container className="mt-5">
-                <Alert variant="warning">
+            <Container className="mt-5 ">
+                <Alert variant="warning ">
                     Effettua la registrazione o accedi per vedere i dettagli
                 </Alert>
             </Container>
@@ -114,8 +117,8 @@ function PostDetails() {
     }
 
     return (
-        <Container className="mt-5">
-            <Card className="mb-2" body style={{ padding: "0.5rem" }}>
+        <Container className="mt-5 ">
+            <Card className="mb-2 bg-dark" body style={{ padding: "0.5rem" }}>
                 <Card.Img
                     variant="top"
                     src={post.cover}
@@ -123,12 +126,12 @@ function PostDetails() {
                     style={{ maxHeight: "400px", objectFit: "cover" }}
                 />
                 <Card.Body>
-                    <Card.Title
+                    <Card.Title className="text-white"
                         style={{ maxHeight: "3em", overflow: "hidden", textOverflow: "ellipsis" }}
                     >
                         {post.title}
                     </Card.Title>
-                    <Card.Text>{post.content}</Card.Text>
+                    <Card.Text className="text-white">{post.content}</Card.Text>
                 </Card.Body>
             </Card>
 

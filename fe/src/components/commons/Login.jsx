@@ -1,21 +1,16 @@
 import React, { useState, useContext } from "react";
-import { Form, Button, Alert } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../context/AuthContext";
+import { useNavigate, Link } from "react-router-dom";
+import { Form, Button, Alert, Container, Row, Col, InputGroup } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { AuthContext } from "../../context/AuthContext";
 import "../../styles/Login.css";
-function Login() {
-    // Stato per gestire i dati del form di login
-    const [formData, setFormData] = useState({ email: "", password: "" });
 
-    // Stato per mostrare/nascondere la password
+function Login() {
+    const [formData, setFormData] = useState({ email: "", password: "" });
     const [showPassword, setShowPassword] = useState(false);
 
-    // Funzioni e valori dal contesto di autenticazione
     const { login, error, setError } = useContext(AuthContext);
-
-    // Hook per la navigazione
     const navigate = useNavigate();
 
     // Funzione per gestire le modifiche nei campi del form
@@ -71,53 +66,62 @@ function Login() {
 
 
     return (
-        <div className="login-form">
-            <h2>Login</h2>
-            {error && <Alert variant="danger">{error}</Alert>} {/* Mostra un messaggio di errore se presente */}
+        <Container className="mt-5">
+            <Row className="justify-content-center">
+                <Col xs={12} md={8} lg={6}>
+                    <div
+                        className="login-form p-3 rounded bg-dark">
+                        <h2 className="mb-3 text-white text-center">Login</h2>
+                        {error && <Alert variant="danger">{error}</Alert>}
 
-            {/* Form di login tradizionale */}
-            <Form onSubmit={handleSubmit}>
-                <Form.Group controlId="emailInput">
-                    <Form.Label>Indirizzo Email</Form.Label>
-                    <Form.Control
-                        type="email"
-                        name="email"
-                        placeholder="Inserisci l'email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                    />
-                </Form.Group>
+                        <Form onSubmit={handleSubmit}>
+                            <Form.Group className="mb-3 text-start" controlId="emailInput">
+                                <Form.Label className="text-white">Email</Form.Label>
+                                <Form.Control
+                                    type="email"
+                                    name="email"
+                                    placeholder="Inserisci l'email"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </Form.Group>
 
-                <Form.Group controlId="passwordInput">
-                    <Form.Label>Password</Form.Label>
-                    <div className="input-group">
-                        <Form.Control
-                            type={showPassword ? "text" : "password"}
-                            name="password"
-                            placeholder="Password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            required
-                        />
-                        <div className="input-group-append align-self-center">
-                            <Button variant="outline-dark" className="ms-2" onClick={togglePasswordVisibility}>
-                                <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
-                            </Button>
+                            <Form.Group className="mb-3 text-start" controlId="passwordInput">
+                                <Form.Label className="text-white">Password</Form.Label>
+                                <InputGroup> {/* InputGroup per il campo password */}
+                                    <Form.Control
+                                        type={showPassword ? "text" : "password"}
+                                        name="password"
+                                        placeholder="Password"
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                    <Button variant="outline-secondary" onClick={togglePasswordVisibility}>
+                                        <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                                    </Button>
+                                </InputGroup>
+                            </Form.Group>
+
+                            <div className="d-grid gap-2">
+                                <Button variant="primary" type="submit">Login</Button>
+                                <Button variant="outline-light" onClick={handleGoogleLogin} className="google-login-button">
+                                    Accedi con Google
+                                </Button>
+                            </div>
+                        </Form>
+
+                        <p className="my-2 text-white text-center">Non hai un account?</p>
+                        <div className="d-grid gap-2">
+                            <Link to="/register" className="btn btn-outline-light">
+                                Register
+                            </Link>
                         </div>
                     </div>
-                </Form.Group>
-
-                <Button variant="outline-dark" type="submit" className="my-3">
-                    Login
-                </Button>
-                {/* Pulsante per il login con Google */}
-                <Button variant="outline-primary" onClick={handleGoogleLogin} className="my-2">
-                    Accedi con Google
-                </Button>
-            </Form>
-
-        </div>
+                </Col>
+            </Row>
+        </Container>
     );
 }
 
