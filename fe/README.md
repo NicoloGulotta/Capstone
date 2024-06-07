@@ -38,8 +38,5 @@ Implementazione dell'autenticazione e autorizzazione: Configurazione dell'autent
 Integrazione del sistema di prenotazione: Sviluppo e integrazione del sistema di prenotazione degli appuntamenti.
 Testing e ottimizzazione: Test approfonditi per garantire la funzionalità, l'usabilità e la sicurezza dell'applicazione. Ottimizzazione delle prestazioni e del codice.
 Deployment: Distribuzione dell'applicazione su un ambiente di produzione.
-Licenza
-[Specifica la licenza che intendi utilizzare (ad esempio, MIT)]
-
 Contatti
 Nicolò Gulotta - gulottanico1998@gmail.com

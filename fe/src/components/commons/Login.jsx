@@ -105,17 +105,17 @@ function Login() {
                             </Form.Group>
 
                             <div className="d-grid gap-2">
-                                <Button variant="primary" type="submit">Login</Button>
-                                <Button variant="outline-light" onClick={handleGoogleLogin} className="google-login-button">
+                                <Button variant="outline-light" type="submit">Login</Button>
+                                {/* <Button variant="outline-primary" onClick={handleGoogleLogin} className="google-login-button">
                                     Accedi con Google
-                                </Button>
+                                </Button> */}
                             </div>
                         </Form>
 
                         <p className="my-2 text-white text-center">Non hai un account?</p>
                         <div className="d-grid gap-2">
                             <Link to="/register" className="btn btn-outline-light">
-                                Register
+                                Registrati
                             </Link>
                         </div>
                     </div>
