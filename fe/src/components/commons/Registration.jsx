@@ -2,10 +2,9 @@ import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Form, Button, Alert, Container, Row, Col } from "react-bootstrap";
 import { AuthContext } from "../../context/AuthContext";
-import "../../styles/Registration.css"; // Importa il CSS personalizzato
+import "../../styles/Registration.css";
 
 function RegistrationForm() {
-  // Stato per gestire i dati del form
   const [formData, setFormData] = useState({
     name: "",
     surname: "",
@@ -16,35 +15,23 @@ function RegistrationForm() {
     avatar: "",
   });
 
-  // Stato per gestire eventuali errori di validazione
+  // Initialize errors as an empty object
   const [errors, setErrors] = useState({});
 
-  const { login, error, setError } = useContext(AuthContext);
-  // Hook per la navigazione
+  const { login, setError } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  // Funzione per gestire le modifiche nei campi del form
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Funzione per gestire l'invio del form
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrors(null); // Resetta eventuali errori precedenti
 
-    // Esempio di validazione (aggiungi la tua logica di validazione qui)
-    const newErrors = {};
-    if (!formData.email.includes("@")) {
-      newErrors.email = "Inserisci una email valida";
-    }
-    if (formData.password.length < 6) {
-      newErrors.password = "La password deve essere di almeno 6 caratteri";
-    }
-    setError(newErrors);
+    const validationErrors = validateForm(formData);
+    setErrors(validationErrors);
 
-    if (Object.keys(newErrors).length === 0) {
-      // Se non ci sono errori, invia i dati al backend per la registrazione
+    if (Object.keys(validationErrors).length === 0) {
       try {
         const response = await fetch("http://localhost:3001/auth/register", {
           method: "POST",
@@ -54,21 +41,22 @@ function RegistrationForm() {
 
         if (response.ok) {
           const data = await response.json();
-          localStorage.setItem("token", data.token); // Salva il token nel localStorage
-          login(data); // Aggiorna il contesto di autenticazione
-          navigate("/"); // Reindirizza alla home page
+          localStorage.setItem("token", data.token);
+          login(data);
+          navigate("/");
         } else {
-          // Login fallito
           const errorData = await response.json();
-          setError(errorData.message || "Login failed. Check your credentials.");
+          // Set a generic error message if the backend doesn't provide a specific one
+          setError(errorData.message || "Registration failed. Please try again.");
         }
       } catch (err) {
-        // Errore di rete o del server
-        console.error("Error during login request:", err.message);
+        console.error("Error during registration request:", err.message);
         setError("Network or server error. Please try again later.");
       }
     }
   };
+
+
 
   return (
     <Container className="mt-5">

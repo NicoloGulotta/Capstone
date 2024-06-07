@@ -53,7 +53,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/settings" element={<Settings />} />
-              <Route path="/registrazione" element={<RegistrationForm />} />
+              <Route path="/register" element={<RegistrationForm />} />
               {/* <Route
                 path="/create-post"
                 element={
