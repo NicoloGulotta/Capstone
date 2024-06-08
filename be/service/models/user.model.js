@@ -1,5 +1,4 @@
 import mongoose, { Schema, model } from "mongoose";
-// import bcrypt from "bcryptjs";
 
 const userSchema = new Schema(
     {
@@ -14,6 +13,7 @@ const userSchema = new Schema(
         username: {
             type: String,
             required: true,
+            unique: true,
         },
         email: {
             type: String,
@@ -33,17 +33,15 @@ const userSchema = new Schema(
         avatar: {
             type: String,
             required: false,
-            default: "https://gravatar.com/avatar/b58a6ab54ad426a204ad8224c6c0390b?s=400&d=robohash&r=X",
+            default:
+                "https://gravatar.com/avatar/b58a6ab54ad426a204ad8224c6c0390b?s=400&d=robohash&r=X",
         },
         password: {
             type: String,
-            required: false,
+            required: true, // La password torna obbligatoria
             select: false,
         },
-        googleId: {
-            type: String,
-            default: null,    // Imposta il valore di default a null
-        },
+        // Rimuovi i campi provider e googleId
         comments: [
             {
                 type: Schema.Types.ObjectId,
@@ -55,10 +53,12 @@ const userSchema = new Schema(
             enum: ["user", "moderator", "admin"],
             default: "user",
         },
-        appointments: [{
-            type: Schema.Types.ObjectId,
-            ref: 'Appointment'
-        }]
+        appointments: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "Appointment",
+            },
+        ],
     },
     {
         collection: "users",
@@ -66,12 +66,4 @@ const userSchema = new Schema(
     }
 );
 
-// // Middleware pre-save per hashare la password
-// userSchema.pre('save', async function (next) {
-//     if (!this.isModified('password')) return next(); // Se la password non è stata modificata, salta l'hashing
-//     this.password = await bcrypt.hash(this.password, 10);
-//     next();
-// });
-
 export default model("User", userSchema);
-

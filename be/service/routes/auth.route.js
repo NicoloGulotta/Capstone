@@ -20,7 +20,7 @@ authRouter.get("/login", (req, res) => {
 authRouter.post("/register", async (req, res, next) => {
     try {
         // Estrai email, password e altri dati dal corpo della richiesta
-        const { email, password, googleId, ...rest } = req.body;
+        const { email, password, ...rest } = req.body;
 
         // Normalizza l'email: rimuovi spazi bianchi, converti in minuscolo
         const normalizedEmail = email.trim().toLowerCase();
@@ -30,7 +30,9 @@ authRouter.post("/register", async (req, res, next) => {
         if (existingUser) {
             return next(createError(409, "Email già registrata")); // Errore 409 Conflict
         }
-
+        // if (!req.body.googleId) {
+        //     req.body.provider = 'local';
+        // }
         // Hash della password (bcrypt)
         const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -38,7 +40,6 @@ authRouter.post("/register", async (req, res, next) => {
         const user = await User.create({
             email: normalizedEmail,
             password: hashedPassword,
-            googleId: googleId || null, // Set to null if googleId is not provided
             ...rest,
         });
 
