@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { parse, format } from 'date-fns';
 import it from 'date-fns/locale/it';
-// import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from '../context/AuthContext';
 
 function AppointmentForm({ postId }) {
-    // const { user } = useContext(AuthContext);
+    const { user } = useContext(AuthContext);
     const minTime = parse("09:00", "HH:mm", new Date());
     const maxTime = parse("20:00", "HH:mm", new Date());
 
@@ -33,8 +33,9 @@ function AppointmentForm({ postId }) {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        const user = localStorage.getItem('user');
         const token = localStorage.getItem('token');
-        if (!token) {
+        if (!token || !user) {
             setAlertMessage('Non sei autenticato.');
             setShowAlert(true);
             return;
@@ -50,7 +51,8 @@ function AppointmentForm({ postId }) {
                 body: JSON.stringify({
                     ...formData,
                     date: format(formData.date, 'yyyy-MM-dd HH:mm'), // Invia data e ora nel formato corretto
-                    serviceType: postId // Invia l'ID del servizio (postId)
+                    serviceType: postId, // Invia l'ID del servizio (postId)
+                    user: user._id
                 }),
             });
             console.log(formData)

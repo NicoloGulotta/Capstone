@@ -8,7 +8,7 @@ function MyNavbar({ onLogout }) {
     const [showModal, setShowModal] = useState(false);
     const handleClose = () => setShowModal(false);
     const handleShow = () => setShowModal(true);
-    console.log(user);
+    // console.log(user);
 
     useEffect(() => {
         // This will trigger a refetch whenever authentication changes.
@@ -88,7 +88,7 @@ function MyNavbar({ onLogout }) {
                                         Impostazioni
                                     </Dropdown.Item>
                                     <Dropdown.Divider />
-                                    <Dropdown.Item onClick={onLogout}>Logout</Dropdown.Item>
+                                    <Dropdown.Item as={Link} to="/" onClick={onLogout}>Logout</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
                         ) : (

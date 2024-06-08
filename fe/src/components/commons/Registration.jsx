@@ -18,7 +18,7 @@ function RegistrationForm() {
   const [errors, setErrors] = useState({});
 
   // Access functions from the AuthContext
-  const { login, setError, isAuthenticated, user, token } = useContext(AuthContext);
+  const { login, setError, isAuthenticated } = useContext(AuthContext);
 
   // Hook for navigation (redirecting after successful registration)
   const navigate = useNavigate();
@@ -49,8 +49,6 @@ function RegistrationForm() {
         if (response.ok) {
           const data = await response.json();
           console.log("Registration successful:", data);
-          user(data.user);
-          token(data.token);
           login(data); // Pass the entire user object
           isAuthenticated(true);
           navigate("/"); // 

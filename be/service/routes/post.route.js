@@ -1,7 +1,8 @@
 import { Router } from "express";
 import dotenv from 'dotenv';
 import Post from "../models/post.model.js";
-import Comment from "../models/comments.model.js"; // Corretto il nome del modello in "comment.model.js"
+import Comment from "../models/comments.model.js";
+import User from "../models/user.model.js";
 import postCover from "../middelware/postCover.js";
 import createError from 'http-errors';
 import { authMiddleware } from "../auth/auth.js";
