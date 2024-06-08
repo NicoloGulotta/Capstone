@@ -31,6 +31,7 @@ function Profile() {
                     if (response.ok) {
                         const data = await response.json();
                         setProfileData(data);
+
                     } else {
                         setError("Errore nel recupero dei dati del profilo.");
                     }
@@ -91,7 +92,7 @@ function Profile() {
                     {/* Sezione appuntamenti */}
                     <section className="mt-4">
                         <h2>I miei appuntamenti</h2>
-                        {profileData.appointments.length === 0 ? (
+                        {profileData && profileData.appointments && profileData.appointments.length === 0 ? (
                             <p>Non hai ancora prenotato nessun appuntamento.</p>
                         ) : (
                             <Table striped bordered hover responsive>
@@ -106,7 +107,7 @@ function Profile() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {profileData.appointments.map((appointment) => {
+                                    {profileData?.appointments?.map(appointment => {
                                         let formattedDateTime = "Data e ora non disponibili";
                                         if (appointment.date) {
                                             formattedDateTime = format(parseISO(appointment.date), "PPPPp", {

@@ -14,7 +14,6 @@ const userSchema = new Schema(
         username: {
             type: String,
             required: true,
-            unique: true,
         },
         email: {
             type: String,
@@ -34,17 +33,16 @@ const userSchema = new Schema(
         avatar: {
             type: String,
             required: false,
-            default: "https://lh3.googleusercontent.com/a/ACg8ocJZHSdTAcUUmJ1_S2PlZFLGXFz8Wu6pwZ-gGhVJG0m0fZJgO-xu=s96-c",
+            default: "https://gravatar.com/avatar/b58a6ab54ad426a204ad8224c6c0390b?s=400&d=robohash&r=X",
         },
         password: {
             type: String,
             required: false,
-            select: false, // Non includere la password nelle query di default
+            select: false,
         },
         googleId: {
             type: String,
-            required: false,
-            unique: true,
+            default: null,    // Imposta il valore di default a null
         },
         comments: [
             {

@@ -9,7 +9,7 @@ export const AuthContext = createContext({
     logout: () => { },
     error: null,
     setError: () => { },
-    updateUser: (updatedUserData) => { },
+    // updateUser: (updatedUserData) => { },
     refetchUserData: () => { },
 });
 
@@ -35,18 +35,9 @@ export const AuthProvider = ({ children }) => {
         const storedToken = localStorage.getItem("token");
         // Check if storedUser is valid JSON
         if (storedUser && storedToken) {
-            try {
-                setIsAuthenticated(true);
-                setUser(storedUser);
-                setToken(storedToken);
-
-            } catch (e) {
-                // Handle JSON parsing errors
-                console.error('Errore nel parsing di JSON:', e);
-            }
-        } else {
-            // Handle the case where the "user" data is not present or not JSON
-            console.log("Dati utente non presenti o non validi in localStorage");
+            setIsAuthenticated(true);
+            setUser(storedUser);
+            setToken(storedToken);
         }
     }, []);
 

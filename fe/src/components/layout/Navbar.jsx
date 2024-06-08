@@ -1,15 +1,30 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Container, Navbar, Nav, Dropdown, Button, Modal } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { AuthContext } from "../../context/AuthContext"; // Assicurati che il percorso sia corretto
+import { AuthContext } from "../../context/AuthContext";
 
 function MyNavbar({ onLogout }) {
-    const { isAuthenticated, user } = useContext(AuthContext);
+    const { isAuthenticated, user, refetchUserData } = useContext(AuthContext);
     const [showModal, setShowModal] = useState(false);
-
     const handleClose = () => setShowModal(false);
     const handleShow = () => setShowModal(true);
-    //console.log(user);
+    console.log(user);
+
+    useEffect(() => {
+        // This will trigger a refetch whenever authentication changes.
+        const fetchData = async () => {
+            try {
+                await refetchUserData();
+            } catch (error) {
+                // Handle error if refetch fails (e.g., display an error message)
+                console.error('Failed to refetch user data:', error);
+            }
+        };
+
+        if (isAuthenticated) {
+            fetchData();
+        }
+    }, [isAuthenticated, refetchUserData]);
     return (
         <Navbar bg="dark" variant="dark" expand="lg" className="mb-3">
             <Container>
@@ -22,7 +37,7 @@ function MyNavbar({ onLogout }) {
                         Home
                     </Nav.Link>
                         {/* Mostra il link "Crea Post" solo se l'utente è autenticato */}
-                        {/* {isAuthenticated && (
+                        {/* {isAuthenticated && isAdmin (
                             <Nav.Link as={Link} to="/create-post">
                                 Crea Post
                             </Nav.Link>
@@ -50,11 +65,11 @@ function MyNavbar({ onLogout }) {
                         <Button variant="outline-light" onClick={handleShow}>
                             Contattaci
                         </Button>
-                        {isAuthenticated ? (
+                        {isAuthenticated && user ? (
                             <Dropdown align="end">
                                 <Dropdown.Toggle variant="link" id="dropdown-user" className="text-light d-flex align-items-center text-decoration-none">
                                     <img
-                                        src={user?.avatar || 'https://gravatar.com/avatar/b58a6ab54ad426a204ad8224c6c0390b?s=400&d=robohash&r=X'}
+                                        src={user?.avatar || 'https://cdn.pixabay.com/photo/2017/02/01/10/46/avatar-2029577_1280.png'}
                                         border-radius="50%"
                                         width="25"
                                         height="25"
@@ -81,7 +96,7 @@ function MyNavbar({ onLogout }) {
                                 <Nav.Link as={Link} to="/login" className="text-light">
                                     Login
                                 </Nav.Link>
-                                <Nav.Link as={Link} to="/registrazione" className="text-light">
+                                <Nav.Link as={Link} to="/register" className="text-light">
                                     Registrazione
                                 </Nav.Link>
                             </>

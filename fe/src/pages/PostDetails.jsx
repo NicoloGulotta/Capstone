@@ -164,7 +164,7 @@ function PostDetails() {
 
             <div className="comments-section">
                 <h3>Commenti</h3>
-                {comments.length > 0 ? (
+                {(comments || []).length > 0 ? (
                     comments.map((comment) => {
                         // Format the date correctly
                         const formattedDate = format(parseISO(comment.createdAt), "PPPPp", { locale: it });

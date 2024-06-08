@@ -48,7 +48,7 @@ export function useFetchUserData() {
         };
 
         fetchUserData(); // Chiama la funzione per recuperare i dati
-    }, [login, logout, setError, isAuthenticated]);
+    }, [login, logout, setError]);
 
     // Restituisce i valori necessari al componente che utilizza questo hook
     return {

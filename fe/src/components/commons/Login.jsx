@@ -34,6 +34,8 @@ function Login() {
             if (response.ok) {
                 // Login riuscito
                 const data = await response.json();
+                console.log("Login successful:", data);
+                console.log("Token:", data.token);
                 localStorage.setItem("token", data.token); // Salva il token nel localStorage
                 login(data); // Aggiorna il contesto di autenticazione
                 navigate("/"); // Reindirizza alla home page
@@ -54,15 +56,15 @@ function Login() {
         setShowPassword((prevState) => !prevState);
     };
 
-    const handleGoogleLogin = () => {
-        const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?
-          response_type=code&
-          client_id=ClientId&
-          scope=profile%20email&
-          redirect_uri=http://localhost:3001/google/callback`;
+    // const handleGoogleLogin = () => {
+    //     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?
+    //       response_type=code&
+    //       client_id=ClientId&
+    //       scope=profile%20email&
+    //       redirect_uri=http://localhost:3001/google/callback`;
 
-        window.location.href = authUrl;
-    };
+    //     window.location.href = authUrl;
+    // };
 
 
     return (

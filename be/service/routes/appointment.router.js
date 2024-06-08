@@ -127,26 +127,25 @@ appointmentRouter.put('/:id', authMiddleware, async (req, res, next) => {
         next(error);
     }
 });
-// DELETE /appointments/:id: Elimina un appuntamento
-appointmentRouter.delete('/:id', authMiddleware, async (req, res, next) => {
+// DELETE /appointment/:appointmentId
+appointmentRouter.delete("/:appointmentId", authMiddleware, async (req, res, next) => {
     try {
-        const appointmentId = req.params.id;
+        const appointmentId = req.params.appointmentId;
 
-        if (!mongoose.Types.ObjectId.isValid(appointmentId)) {
-            return res.status(400).json({ message: 'ID appuntamento non valido.' });
-        }
-
+        // Trova e cancella l'appuntamento
         const deletedAppointment = await Appointment.findByIdAndDelete(appointmentId);
+
         if (!deletedAppointment) {
-            return res.status(404).json({ message: 'Appuntamento non trovato.' });
+            return next(createError(404, "Appuntamento non trovato"));
         }
 
-        // Verifica che l'utente sia autorizzato
-        if (deletedAppointment.user.toString() !== req.user._id.toString()) {
-            return res.status(403).json({ message: 'Non sei autorizzato a eliminare questo appuntamento.' });
-        }
+        // Aggiorna il documento utente rimuovendo l'ID dell'appuntamento cancellato
+        await User.findByIdAndUpdate(
+            deletedAppointment.user, // ID dell'utente associato all'appuntamento
+            { $pull: { appointments: appointmentId } }  // Rimuovi l'ObjectId dall'array
+        );
 
-        res.json({ message: 'Appuntamento eliminato con successo.' });
+        res.status(204).send(); // 204 No Content (successo senza contenuto da restituire)
     } catch (error) {
         next(error);
     }
