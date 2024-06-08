@@ -166,11 +166,11 @@ postRouter.post("/:postId/comments", authMiddleware, async (req, res, next) => {
     try {
         const commentData = req.body;
         commentData.author = req.user._id;
-        commentData.post = req.params.postId; // Associa il commento al post
+        commentData.post = req.params.postId;
 
         const comment = await Comment.create(commentData);
 
-        // Aggiorna SOLO il campo 'comments'
+        // Aggiorna il post
         const post = await Post.findByIdAndUpdate(
             req.params.postId,
             { $push: { comments: comment._id } },
@@ -181,11 +181,20 @@ postRouter.post("/:postId/comments", authMiddleware, async (req, res, next) => {
             return next(createError(404, "Post non trovato"));
         }
 
-        res.send(post);
+        // Aggiorna il documento dell'utente (associa il commento)
+        await User.findByIdAndUpdate(req.user._id, {
+            $push: { comments: comment._id }
+        });
+
+        res.status(201).json({
+            message: "Commento creato con successo",
+            comment
+        });
     } catch (error) {
         next(error);
     }
 });
+
 // async function removeCommentField() {
 //     try {
 //         const result = await Post.updateMany({}, { $unset: { comment: "" } });
