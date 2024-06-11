@@ -30,7 +30,13 @@ function MyNavbar() {
                 <Navbar bg="dark" variant="dark" expand="lg" className="mb-3 ">
                     <Container>
                         <Navbar.Brand as={Link} to="/">
-                            ScissorHand
+                            <img
+                                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRnBDKahJ0IKIWDE-ZC9uflGDHsSxi-Rj47Xg&s"
+                                alt=" ScissorHand Logo"
+                                className="navbar-brand-logo"
+                                style={{ width: "40px", height: "40px" }}
+
+                            /> ScissorHand
                         </Navbar.Brand>
                         <Navbar.Toggle aria-controls="basic-navbar-nav" />
                         <Navbar.Collapse id="basic-navbar-nav">
