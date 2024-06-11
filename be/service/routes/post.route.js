@@ -85,7 +85,7 @@ postRouter.delete('/:postId', authMiddleware, async (req, res, next) => {
 // POST /posts: Crea un nuovo post (richiede autenticazione e postCover)
 postRouter.post('/', authMiddleware, postCover, async (req, res, next) => { // Corretto il percorso a "/posts"
     try {
-        const data = req.body.data ? JSON.parse(req.body.data) : req.body;
+        const data = req.body.data ? JSON.stringify(req.body.data) : req.body;
         const userId = req.user._id;
         const cover = req.file ? req.file.filename : undefined;
 

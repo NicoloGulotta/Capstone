@@ -10,6 +10,7 @@
   justify-content: center;
   padding: 15px 0;
   background-color: #333;
+  z-index: 0;
 }
 footer {
   width: 100%; /* Occupa l'intera larghezza della viewport */

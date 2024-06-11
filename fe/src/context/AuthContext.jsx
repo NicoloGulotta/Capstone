@@ -38,14 +38,21 @@ export const AuthProvider = ({ children }) => {
     // Verifica l'autenticazione al caricamento dell'app
     useEffect(() => {
         const storedToken = localStorage.getItem("token");
-        const storedUser = JSON.parse(localStorage.getItem("user"));
+        const storedUser = localStorage.getItem("user");
 
         if (storedToken && storedUser) {
             setIsAuthenticated(true);
             setUser(storedUser);
             setToken(storedToken);
+        } else {
+            // Rimuoviamo token e user se non validi
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            setIsAuthenticated(false);
+            setUser(null);
+            setToken(null);
         }
-    }, []); // Non è più necessario refetchUserData
+    }, []); // No dependencies needed here
 
     return (
         <AuthContext.Provider

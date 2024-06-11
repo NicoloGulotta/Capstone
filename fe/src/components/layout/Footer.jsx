@@ -13,7 +13,7 @@ const Footer = () => {
     const handleShow = () => setShowModal(true);
 
     return (
-        <footer className={`bg-dark ${location.pathname === "/" ? "" : "footer-style"}`}>
+        <footer className={`bg-dark ${location.pathname === "/" || location.pathname === "/register" ? "" : "footer-style"}`}>
             <div className="container">
                 <div className="row">
                     <div className="col-md-4">

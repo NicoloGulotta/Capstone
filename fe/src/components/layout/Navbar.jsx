@@ -8,17 +8,17 @@ function MyNavbar() {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        // Verifica se l'utente è autenticato
         const storedToken = localStorage.getItem("token");
-        const storedUser = JSON.parse(localStorage.getItem("user"));
-        if (storedToken && storedUser) {
+
+        if (storedToken) {
             setIsAuthenticated(true);
-            setUser(storedUser);
             setToken(storedToken);
             setIsLoading(false);
         } else {
             setIsLoading(false);
         }
-    }, [setIsAuthenticated, setUser, setToken]);
+    }, [setIsAuthenticated, setToken]);
 
     return (
         <>

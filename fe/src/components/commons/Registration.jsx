@@ -97,7 +97,7 @@ function RegistrationForm() {
 
   // 8. Rendering del componente JSX
   return (
-    <Container className="mt-5">
+    <Container className="my-4">
       <Row className="justify-content-center">
         <Col xs={12} md={8} lg={6}>
           {showAlert && <CustomAlert {...alertData} />}
