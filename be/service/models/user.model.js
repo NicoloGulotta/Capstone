@@ -33,8 +33,7 @@ const userSchema = new Schema(
         avatar: {
             type: String,
             required: false,
-            default:
-                "https://gravatar.com/avatar/b58a6ab54ad426a204ad8224c6c0390b?s=400&d=robohash&r=X",
+            default: () => "https://cdn-icons-png.flaticon.com/512/149/149071.png",
         },
         password: {
             type: String,

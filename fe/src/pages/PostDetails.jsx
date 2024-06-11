@@ -117,7 +117,7 @@ function PostDetails() {
     }
 
     return (
-        <Container className="mt-5 ">
+        <Container className="mt-5 z-index  ">
             <Card className="mb-2 bg-dark" body style={{ padding: "0.5rem" }}>
                 <Card.Img
                     variant="top"

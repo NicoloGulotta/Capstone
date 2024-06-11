@@ -71,7 +71,7 @@ function Login() {
 
 
     return (
-        <Container className="my-5">
+        <Container className="my-5 login-container">
             <Row className="justify-content-center">
                 <Col xs={12} md={8} lg={6}>
                     <div className="alert-container">

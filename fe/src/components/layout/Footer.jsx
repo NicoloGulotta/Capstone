@@ -4,17 +4,15 @@ import { faFacebook, faTwitter, faInstagram } from '@fortawesome/free-brands-svg
 import { useState } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import "../../styles/Footer.css";
-import { useLocation } from "react-router-dom"; // Importa useLocation
 
 const Footer = () => {
-    const location = useLocation();
     const [showModal, setShowModal] = useState(false);
     const handleClose = () => setShowModal(false);
     const handleShow = () => setShowModal(true);
 
     return (
-        <footer className={`bg-dark ${location.pathname === "/" || location.pathname === "/register" ? "" : "footer-style"}`}>
-            <div className="container">
+        <footer className="bg-dark ">
+            <div div className="container">
                 <div className="row">
                     <div className="col-md-4">
                         <h4 className="text-white ">Informazioni Legali</h4>
@@ -73,7 +71,7 @@ const Footer = () => {
                     </div>
                 </div>
             </div>
-        </footer>
+        </footer >
     );
 };
 

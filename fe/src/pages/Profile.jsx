@@ -97,7 +97,7 @@ function Profile() {
                 </div>
             ) : profileData ? (
                 // Se ci sono dati del profilo, mostra la sezione appuntamenti
-                <div className="text-center w-100 h-100">
+                <div className="text-center profile-container">
                     <section className="mt-4 appointment-box">
                         {/* Titolo della sezione */}
                         <h2>
@@ -149,7 +149,7 @@ function Profile() {
                             </Table>
                         )}
                         {/* Bottone per prenotare un nuovo appuntamento */}
-                        <Button variant="primary" className="mb-3" onClick={() => navigate("/")}>
+                        <Button variant="outline-dark" className="mb-4" onClick={() => navigate("/")}>
                             Prenota un nuovo appuntamento
                         </Button>
                     </section>
