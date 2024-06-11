@@ -15,7 +15,6 @@ function AppointmentForm({ postId }) {
         date: new Date(),
         notes: '',
         serviceType: postId,
-        // Not necessary to send user ID as the backend will get it from the authentication
     });
 
     const [showAlert, setShowAlert] = useState(false);
@@ -33,7 +32,7 @@ function AppointmentForm({ postId }) {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        const user = localStorage.getItem('user');
+        user && localStorage.setItem('user', JSON.stringify(user));
         const token = localStorage.getItem('token');
         if (!token || !user) {
             setAlertMessage('Non sei autenticato.');

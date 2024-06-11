@@ -1,9 +1,13 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebook, faTwitter, faInstagram } from '@fortawesome/free-brands-svg-icons';
+import { useState } from 'react';
+import { Modal, Button } from 'react-bootstrap';
 import '../../styles/Footer.css';
 const Footer = () => {
-
+    const [showModal, setShowModal] = useState(false);
+    const handleClose = () => setShowModal(false);
+    const handleShow = () => setShowModal(true);
 
     return (
         <footer className="bg-dark text-white py-4 mt-5 fix-bottom">
@@ -20,8 +24,25 @@ const Footer = () => {
                     <div className="col-md-4">
                         <h4 className="text-white">Assistenza Clienti</h4>
                         <ul className="list-unstyled">
-                            <li><a href="/#" className="text-white">Contattaci</a></li>
-                            <li><a href="/#" className="text-white">Gift Cards</a></li>
+                            <Button variant="outline-light" onClick={handleShow}>
+                                Contattaci
+                            </Button>
+                            <Modal show={showModal} onHide={handleClose}>
+                                <Modal.Header closeButton>
+                                    <Modal.Title>Contattaci</Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+                                    <p>
+                                        Puoi contattarci al numero di telefono 123-456-7890 o
+                                        all'indirizzo email info@hairsalon.com.
+                                    </p>
+                                </Modal.Body>
+                                <Modal.Footer>
+                                    <Button variant="secondary" onClick={handleClose}>
+                                        Chiudi
+                                    </Button>
+                                </Modal.Footer>
+                            </Modal>                            <li><a href="/#" className="text-white">Gift Cards</a></li>
                         </ul>
                     </div>
                     <div className="col-md-4">

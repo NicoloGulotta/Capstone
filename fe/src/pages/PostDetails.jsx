@@ -151,7 +151,7 @@ function PostDetails() {
                     <Form.Label className="mb-2">Valutazione</Form.Label>
                     <Rating
                         name="rating"
-                        size={30}
+                        size={24}
                         value={newCommentRating}
                         onChange={(newRating) => setNewCommentRating(newRating)}
                         activeColor="#ffd700" // Classic gold for active stars

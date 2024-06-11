@@ -1,79 +1,108 @@
-import React, { useState, useContext, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useContext } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import { AuthContext } from "../../context/AuthContext";
+import CustomAlert from "../Alert";
 import "../../styles/Registration.css";
+
 function RegistrationForm() {
-  // State to manage form data
+  // 1. Stato per gestire i dati del modulo
   const [formData, setFormData] = useState({
     name: "",
     surname: "",
     username: "",
     email: "",
     password: "",
-    dataDiNascita: "",
+    dataDiNascita: "", // Assicurati che il nome del campo corrisponda al backend
   });
 
-  // State to manage errors for each form field (initially empty)
+  // 2. Stato per gestire gli errori di validazione
   const [errors, setErrors] = useState({});
 
-  // Access functions from the AuthContext
-  const { login, setError, isAuthenticated } = useContext(AuthContext);
+  // 3. Stato per gestire la visualizzazione dell'alert
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertData, setAlertData] = useState({ type: '', message: '' });
 
-  // Hook for navigation (redirecting after successful registration)
+  // 4. Accesso al contesto di autenticazione e navigazione
+  const { login, setIsAuthenticated } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  // Function to update form data when input changes
+  // 5. Funzione per gestire le modifiche ai campi del form
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Function to handle form submission  
-  const Handlesubmit = async (e) => {
+  // 6. Funzione per gestire l'invio del form
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate form data
+    // 6.1 Validazione dei dati del form
     const validationErrors = validateForm(formData);
     setErrors(validationErrors);
 
-    // If validation passes, proceed with registration
+    // 6.2 Se non ci sono errori di validazione, procedi con la registrazione
     if (Object.keys(validationErrors).length === 0) {
       try {
+        // 6.2.1 Invia la richiesta di registrazione al server
         const response = await fetch("http://localhost:3001/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
         });
 
-        // Handle successful registration
+        // 6.2.2 Gestione della risposta del server
         if (response.ok) {
           const data = await response.json();
-          console.log("Registration successful:", data);
-          login(data); // Pass the entire user object
-          isAuthenticated(true);
-          navigate("/"); // 
+
+          // 6.2.2.1 Registrazione avvenuta con successo
+          setShowAlert(true);
+          setAlertData({ type: 'success', message: data.message || "Registrazione avvenuta con successo!" });
+          localStorage.setItem("token", data.token); // Memorizza il token
+
+          // Aggiorna il contesto di autenticazione e reindirizza dopo 1.5 secondi
+          login(data);
+          setIsAuthenticated(true);
+          setTimeout(() => navigate("/"), 1500);
         } else {
-          // Handle registration errors from the backend
+          // 6.2.2.2 Registrazione fallita (errore lato server)
           const errorData = await response.json();
-          setError(errorData.message || "Registration failed. Please try again.");
+          setShowAlert(true);
+          setAlertData({ type: 'danger', message: errorData.message || "Registrazione fallita. Riprova più tardi." });
         }
       } catch (err) {
-        // Handle network or server errors
-        console.error("Error during registration:", err.message);
-        setError("Network or server error. Please try again later.");
+        // 6.2.3 Gestione degli errori di rete
+        console.error("Errore durante la registrazione:", err.message);
+        setShowAlert(true);
+        setAlertData({ type: 'danger', message: "Errore di rete o del server. Riprova più tardi." });
       }
     }
   };
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/profile");
-    }
-  }, [isAuthenticated, navigate]);
+
+  //7. Function to validate form data
+  function validateForm(data) {
+    const errors = {};
+    if (!data.name.trim()) errors.name = "Il nome è richiesto";
+    if (!data.surname.trim()) errors.surname = "Il cognome è richiesto";
+    if (!data.username.trim()) errors.username = "L'username è richiesto";
+    if (!data.email.trim()) errors.email = "L'email è richiesta";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email))
+      errors.email = "Formato email non valido";
+    if (!data.password.trim()) errors.password = "La password è richiesta";
+    if (data.password.length < 8)
+      errors.password = "La password deve essere di almeno 8 caratteri";
+    if (!data.dataDiNascita.trim())
+      errors.dataDiNascita = "La data di nascita è richiesta";
+    return errors;
+  }
+
+  // 8. Rendering del componente JSX
   return (
     <Container className="mt-5">
       <Row className="justify-content-center">
         <Col xs={12} md={8} lg={6}>
-          <Form className="registration-form p-3 rounded bg-dark" onSubmit={Handlesubmit}>
+          {showAlert && <CustomAlert {...alertData} />}
+
+          <Form className="registration-form p-3 rounded bg-dark" onSubmit={handleSubmit}>
             <h2 className="text-center mb-4 text-white">Registrati</h2>
 
             {/* Campi del form */}
@@ -148,35 +177,21 @@ function RegistrationForm() {
               />
               <Form.Control.Feedback type="invalid">{errors.dataDiNascita}</Form.Control.Feedback>
             </Form.Group>
+            <Button variant="outline-light" type="submit" className="w-100">
+              Registrati
+            </Button>
 
-            {/* Pulsante di registrazione */}
+            <p className="mt-2 text-center text-white">Hai un account?</p>
             <div className="d-grid gap-2">
-              <Button variant="outline-light" type="submit" className="my-3">
-                Registrati
-              </Button>
+              <Link to="/login" className="btn btn-outline-light">
+                Accedi
+              </Link>
             </div>
           </Form>
         </Col>
       </Row>
     </Container>
   );
-
-
-  // Function to validate form data
-  function validateForm(data) {
-    const errors = {};
-    if (!data.name.trim()) errors.name = "Il nome è richiesto";
-    if (!data.surname.trim()) errors.surname = "Il cognome è richiesto";
-    if (!data.username.trim()) errors.username = "L'username è richiesto";
-    if (!data.email.trim()) errors.email = "L'email è richiesta";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email))
-      errors.email = "Formato email non valido";
-    if (!data.password.trim()) errors.password = "La password è richiesta";
-    if (data.password.length < 8)
-      errors.password = "La password deve essere di almeno 8 caratteri";
-    if (!data.dataDiNascita.trim())
-      errors.dataDiNascita = "La data di nascita è richiesta";
-    return errors;
-  }
 }
+
 export default RegistrationForm;

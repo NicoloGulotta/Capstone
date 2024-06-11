@@ -16,51 +16,62 @@ const authRouter = Router();
 authRouter.get("/login", (req, res) => {
     res.redirect(`${process.env.FRONTEND_URL}/login`);
 });
+
 // POST /auth/register (Registrazione nuovo utente)
 authRouter.post("/register", async (req, res, next) => {
     try {
-        // Estrai email, password e altri dati dal corpo della richiesta
+        // 1. Estrai i dati dalla richiesta
         const { email, password, ...rest } = req.body;
 
-        // Normalizza l'email: rimuovi spazi bianchi, converti in minuscolo
+        // 2. Normalizza l'email
         const normalizedEmail = email.trim().toLowerCase();
 
-        // Verifica se l'email è già presente nel database (case-insensitive)
+        // 3. Verifica se l'email è già registrata
         const existingUser = await User.findOne({ email: normalizedEmail });
         if (existingUser) {
-            return next(createError(409, "Email già registrata")); // Errore 409 Conflict
+            return next(createError(409, "Email già registrata"));
         }
-        // if (!req.body.googleId) {
-        //     req.body.provider = 'local';
-        // }
-        // Hash della password (bcrypt)
+
+
+        // 4. Hash della password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Creazione del nuovo utente nel database (utilizzando l'email normalizzata)
-        const user = await User.create({
+        // 5. Crea il nuovo utente nel database
+        const newUser = await User.create({
             email: normalizedEmail,
             password: hashedPassword,
             ...rest,
         });
 
-        // Generazione del token JWT
-        const token = jwt.sign(
-            { userId: user._id },      // Payload: ID utente 
-            process.env.JWT_SECRET_KEY, // Chiave segreta (da .env)
-            { expiresIn: "1h" }         // Opzioni (es. tempo di scadenza)
-        );
+        // 6. Genera il JWT (solo dopo la creazione dell'utente)
+        const payload = {
+            userId: newUser._id,
+            user: {
+                name: newUser.name,
+                email: newUser.email,
+                role: newUser.role,
+                // ... altri dati utente (opzionale)
+            },
+        };
+        const { token, user: userData } = await generateJWT(payload);
 
-        // Risposta in caso di successo (codice 201 Created)
+        // 9. Risposta di successo (201 Created)
         res.status(201).json({
             message: "Registrazione avvenuta con successo",
-            user: user,             // Dati utente (senza password)
-            token: token            // Token JWT per l'autenticazione
+            user: userData, // Dati utente (senza password)
+            token: token,
         });
 
     } catch (error) {
-        // Gestione degli errori generici (500 Internal Server Error)
+        // 10. Gestione degli errori
         console.error("Errore durante la registrazione:", error);
-        next(createError(500, "Errore interno del server"));
+
+        // Differenzia tra errori di validazione e altri errori del server
+        if (error.name === 'ValidationError') {
+            return next(createError(400, error.message)); // Errore 400 per validazione
+        } else {
+            return next(createError(500, "Errore interno del server")); // Errore 500 generico
+        }
     }
 });
 
@@ -98,11 +109,12 @@ authRouter.get("/profile", authMiddleware, async (req, res, next) => {
             });
 
         if (!user) {
-            // Restituisci un codice di stato 202 Accepted se l'utente non è ancora disponibile
+
             return res.status(202).json({ message: "Registrazione completata. Profilo in elaborazione." });
         }
 
         res.json(user);
+
     } catch (error) {
         next(createError(500, "Errore interno del server"));
     }

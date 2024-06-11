@@ -1,15 +1,17 @@
 import React, { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Form, Button, Alert, Container, Row, Col, InputGroup } from "react-bootstrap";
+import { Form, Button, Container, Row, Col, InputGroup } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { AuthContext } from "../../context/AuthContext";
+import CustomAlert from "../Alert";
 import "../../styles/Login.css";
 
 function Login() {
     const [formData, setFormData] = useState({ email: "", password: "" });
     const [showPassword, setShowPassword] = useState(false);
-
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertData, setAlertData] = useState({ type: '', message: '' });
     const { login, error, setError } = useContext(AuthContext);
     const navigate = useNavigate();
 
@@ -35,14 +37,15 @@ function Login() {
                 // Login riuscito
                 const data = await response.json();
                 console.log("Login successful:", data);
-                console.log("Token:", data.token);
-                localStorage.setItem("token", data.token); // Salva il token nel localStorage
-                login(data); // Aggiorna il contesto di autenticazione
-                navigate("/"); // Reindirizza alla home page
+                localStorage.setItem("token", data.token);
+                login(data);
+                navigate("/");
             } else {
                 // Login fallito
                 const errorData = await response.json();
-                setError(errorData.message || "Login failed. Check your credentials.");
+                setError(errorData.message || "Login failed.");
+                setShowAlert(true); // Mostra l'alert
+                setAlertData({ type: 'danger', message: "Password o email errati" });
             }
         } catch (err) {
             // Errore di rete o del server
@@ -71,10 +74,12 @@ function Login() {
         <Container className="mt-5">
             <Row className="justify-content-center">
                 <Col xs={12} md={8} lg={6}>
+                    <div className="alert-container">
+                        {showAlert && error && <CustomAlert {...alertData} />}
+                    </div>
                     <div
                         className="login-form p-3 rounded bg-dark">
                         <h2 className="mb-3 text-white text-center">Login</h2>
-                        {error && <Alert variant="danger">{error}</Alert>}
 
                         <Form onSubmit={handleSubmit}>
                             <Form.Group className="mb-3 text-start" controlId="emailInput">

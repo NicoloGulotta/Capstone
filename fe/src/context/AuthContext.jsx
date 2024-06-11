@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 export const AuthContext = createContext({
@@ -9,8 +9,6 @@ export const AuthContext = createContext({
     logout: () => { },
     error: null,
     setError: () => { },
-    // updateUser: (updatedUserData) => { },
-    refetchUserData: () => { },
 });
 
 export const AuthProvider = ({ children }) => {
@@ -20,72 +18,48 @@ export const AuthProvider = ({ children }) => {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    // Login Function
-    const login = (userData) => {
+    const login = useCallback((userData) => {
         setIsAuthenticated(true);
         setUser(userData.user);
         setToken(userData.token);
         localStorage.setItem("token", userData.token);
         localStorage.setItem("user", JSON.stringify(userData.user));
-    };
+    }, [setIsAuthenticated, setUser, setToken]);
 
-    // Check Authentication on App Load
-    useEffect(() => {
-        const storedUser = localStorage.getItem("user");
-        const storedToken = localStorage.getItem("token");
-        // Check if storedUser is valid JSON
-        if (storedUser && storedToken) {
-            setIsAuthenticated(true);
-            setUser(storedUser);
-            setToken(storedToken);
-        }
-    }, []);
-
-    // Logout Function
-    const logout = () => {
+    const logout = useCallback(() => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         setIsAuthenticated(false);
         setUser(null);
         setToken(null);
         navigate("/");
-    };
+    }, [navigate]);
 
-    // Refetch User Data Function
-    const refetchUserData = async () => {
-        try {
-            const storedUser = JSON.parse(localStorage.getItem("user"));
-            const storedToken = localStorage.getItem("token");
-            if (storedUser && storedUser.token) {
-                const response = await fetch("http://localhost:3001/auth/profile", {
-                    headers: { Authorization: `Bearer ${storedToken}` },
-                });
+    // Verifica l'autenticazione al caricamento dell'app
+    useEffect(() => {
+        const storedToken = localStorage.getItem("token");
+        const storedUser = JSON.parse(localStorage.getItem("user"));
 
-                if (response.ok) {
-                    const data = await response.json();
-                    setUser(data); // Update user state
-                    return data; // Return the updated user data
-                } else {
-                    throw new Error("Failed to refetch user data");
-                }
-            }
-        } catch (error) {
-            setError("Error refetching user data: " + error.message);
-            throw error; // Rethrow the error to be handled by the calling component
+        if (storedToken && storedUser) {
+            setIsAuthenticated(true);
+            setUser(storedUser);
+            setToken(storedToken);
         }
-    };
+    }, []); // Non è più necessario refetchUserData
 
     return (
         <AuthContext.Provider
             value={{
                 isAuthenticated,
+                setIsAuthenticated,
                 user,
+                setUser,
                 token,
+                setToken,
                 login,
                 logout,
                 error,
                 setError,
-                refetchUserData,
             }}
         >
             {children}
