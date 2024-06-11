@@ -1,5 +1,6 @@
 /* Stile di base del footer */
-footer.fix-bottom {
+.footer-style {
+  position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
@@ -10,15 +11,30 @@ footer.fix-bottom {
   padding: 15px 0;
   background-color: #333;
 }
-footer.fix-bottom a {
+footer {
+  width: 100%; /* Occupa l'intera larghezza della viewport */
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px 0;
+  background-color: #333;
+}
+footer.footer-style a {
   text-decoration: none;
 }
-
+footer a {
+  text-decoration: none;
+}
 /* Stili per le icone social */
+.social-icons {
+  display: flex;
+  justify-content: center;
+}
+
 .social-icons a {
   margin: 0 15px;
-  display: inline-block;
-  text-decoration: none;
+  display: inline-flex;
 }
 
 .social-icons svg {
@@ -33,40 +49,44 @@ footer.fix-bottom a {
   opacity: 0.8;
 }
 
-/* Media query per schermi grandi (desktop) */
+/* Per schermi grandi (desktop) */
 @media (min-width: 992px) {
-  footer.fix-bottom {
+  footer.footer-style {
     padding: 25px 0;
   }
 }
 
-/* Media query per schermi medi (tablet landscape) */
-@media (max-width: 992px) and (min-width: 768px) {
+/* Per schermi medi (tablet landscape) */
+@media (max-width: 992px) {
   .social-icons svg {
     width: 25px;
     height: 25px;
   }
-
-  .social-icons a {
-    margin: 0 10px;
-  }
-}
-
-/* Media query per schermi piccoli (tablet portrait) */
-@media (max-width: 768px) and (min-width: 576px) {
-  footer.fix-bottom {
+  .footer-style {
     padding: 20px 0;
+    position: static;
+  }
+  .social-icons a {
+    margin: 0 10px; /* Riduci lo spazio tra le icone per schermi medi */
   }
 }
 
-/* Media query per schermi molto piccoli (smartphone) */
-@media (max-width: 576px) {
-  footer.fix-bottom {
-    padding: 15px 0;
+/* Per schermi piccoli (tablet portrait) */
+@media (max-width: 768px) {
+  .footer-style {
+    padding: 20px 0;
+    position: static;
   }
+}
 
+/* Per schermi molto piccoli (smartphone) */
+@media (max-width: 576px) {
   .social-icons svg {
     width: 20px;
     height: 20px;
+  }
+  .footer-style {
+    padding: 20px 0;
+    position: static;
   }
 }

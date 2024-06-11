@@ -58,7 +58,7 @@ function App() {
             </Routes>
           )}
         </Container>
-        <Footer style={{ marginTop: "auto" }} /> {/* Footer fisso in fondo */}
+        <Footer />
       </AuthProvider>
     </BrowserRouter>
   );

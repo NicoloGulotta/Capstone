@@ -1,66 +1,40 @@
-import React, { useContext, useEffect, useState, useCallback } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { Container, Navbar, Nav, Dropdown } from "react-bootstrap";
 import { AuthContext } from "../../context/AuthContext";
 
-function MyNavbar({ onLogout }) {
-    const { isAuthenticated, user, setIsAuthenticated, setUser, setToken } = useContext(AuthContext);
-    const navigate = useNavigate();
+function MyNavbar() {
+    const { isAuthenticated, user, setIsAuthenticated, setUser, setToken, logout } = useContext(AuthContext);
     const [isLoading, setIsLoading] = useState(true);
-    // Funzione logout (ora è useCallback)
-    const logout = useCallback(() => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        setIsAuthenticated(false);
-        setUser(null);
-        setToken(null);
-        navigate("/login");
-    }, [navigate, setIsAuthenticated, setUser, setToken]);
 
-    // Effetto per verificare l'autenticazione all'avvio
     useEffect(() => {
-        const checkAuthentication = async () => {
-            const storedToken = localStorage.getItem("token");
-            if (storedToken) {
-                try {
-                    const response = await fetch("http://localhost:3001/auth/profile", {
-                        headers: { Authorization: `Bearer ${storedToken}` },
-                    });
-                    if (response.ok) {
-                        const data = await response.json();
-                        setIsAuthenticated(true);
-                        setUser(data);
-                        setToken(storedToken);
-                    } else {
-                        logout(); // Forza il logout se il token non è valido
-                    }
-                } catch (error) {
-                    console.error('Failed to check authentication:', error);
-                    // Opzionale: mostrare un alert di errore generico
-                }
-            }
-            setIsLoading(false); // Termina il caricamento
-        };
-
-        checkAuthentication();
-    }, [logout, setIsAuthenticated, setUser, setToken]); // Dipendenza del logout per useCallback
-
+        const storedToken = localStorage.getItem("token");
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        if (storedToken && storedUser) {
+            setIsAuthenticated(true);
+            setUser(storedUser);
+            setToken(storedToken);
+            setIsLoading(false);
+        } else {
+            setIsLoading(false);
+        }
+    }, [setIsAuthenticated, setUser, setToken]);
 
     return (
         <>
 
             {/* Mostra un messaggio di caricamento finché l'autenticazione non è verificata */}
-            {!isAuthenticated && isLoading ? (
+            {!isAuthenticated && !setToken(null) && !setUser(null) && isLoading ? (
                 <p>Caricamento...</p>
             ) : (
-                <Navbar bg="dark" variant="dark" expand="lg" className="mb-3">
+                <Navbar bg="dark" variant="dark" expand="lg" className="mb-3 ">
                     <Container>
                         <Navbar.Brand as={Link} to="/">
                             ScissorHand
                         </Navbar.Brand>
                         <Navbar.Toggle aria-controls="basic-navbar-nav" />
                         <Navbar.Collapse id="basic-navbar-nav">
-                            <Nav className="me-auto"><Nav.Link as={Link} to="/">
+                            <Nav className="m-auto"><Nav.Link as={Link} to="/">
                                 Home
                             </Nav.Link>
                                 {/* Mostra il link "Crea Post" solo se l'utente è autenticato */}
@@ -69,10 +43,7 @@ function MyNavbar({ onLogout }) {
                                 Crea Post
                             </Nav.Link>
                         )} */}
-
-
                             </Nav>
-
                             <Nav>
 
                                 {isAuthenticated && user ? (
@@ -98,7 +69,7 @@ function MyNavbar({ onLogout }) {
                                                 Impostazioni
                                             </Dropdown.Item>
                                             <Dropdown.Divider />
-                                            <Dropdown.Item as={Link} to="/" onClick={onLogout}>Logout</Dropdown.Item>
+                                            <Dropdown.Item as={Link} to="/" onClick={logout}>Logout</Dropdown.Item>
                                         </Dropdown.Menu>
                                     </Dropdown>
                                 ) : (

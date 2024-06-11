@@ -56,13 +56,13 @@ function RegistrationForm() {
 
           // 6.2.2.1 Registrazione avvenuta con successo
           setShowAlert(true);
-          setAlertData({ type: 'success', message: data.message || "Registrazione avvenuta con successo!" });
+          setAlertData({ type: 'success', message: data.message || "Registrazione avvenuta con successo! Effettua il login!" });
           localStorage.setItem("token", data.token); // Memorizza il token
 
           // Aggiorna il contesto di autenticazione e reindirizza dopo 1.5 secondi
           login(data);
           setIsAuthenticated(true);
-          setTimeout(() => navigate("/"), 1500);
+          setTimeout(() => navigate("/login"), 1500);
         } else {
           // 6.2.2.2 Registrazione fallita (errore lato server)
           const errorData = await response.json();

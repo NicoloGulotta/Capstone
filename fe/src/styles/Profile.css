@@ -1,0 +1,45 @@
+/* Stili di base per il box degli appuntamenti */
+.appointments-box {
+  /* Stili comuni a tutte le dimensioni dello schermo */
+  background-color: #fff; /* Sfondo bianco */
+  padding: 20px;
+  border-radius: 10px; /* Angoli arrotondati */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Ombra leggera */
+  overflow-x: auto; /* Abilita lo scroll orizzontale se il contenuto è troppo largo */
+}
+
+.appointments-box table {
+  width: 100%; /* Assicura che la tabella occupi tutta la larghezza del contenitore */
+  border-collapse: collapse; /* Rimuovi spazi tra le celle */
+}
+
+.appointments-box th,
+.appointments-box td {
+  padding: 10px;
+  border: 1px solid #ddd; /* Bordo sottile tra le celle */
+  text-align: left;
+}
+
+/* Media query per schermi più piccoli (iPhone SE) */
+@media (max-width: 375px) {
+  .appointments-box {
+    font-size: 14px; /* Riduci la dimensione del font */
+    padding: 10px;
+  }
+
+  .appointments-box th,
+  .appointments-box td {
+    padding: 8px;
+    width: 100px;
+  }
+
+  .appointments-box table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+    margin-bottom: 10px;
+  }
+}

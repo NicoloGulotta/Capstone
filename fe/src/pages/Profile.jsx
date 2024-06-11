@@ -4,48 +4,55 @@ import { Alert, Table, Button, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { format, parseISO } from "date-fns";
 import it from "date-fns/locale/it";
-
+import "../styles/Profile.css";
 function Profile() {
+    // 1. Utilizzo del Context e State
     const { isAuthenticated, token } = useContext(AuthContext);
-    const [profileData, setProfileData] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const navigate = useNavigate();
+    const [profileData, setProfileData] = useState(null); // Stato per i dati del profilo utente
+    const [isLoading, setIsLoading] = useState(true); // Stato per indicare se i dati sono in caricamento
+    const [error, setError] = useState(null); // Stato per gestire eventuali errori
+    const navigate = useNavigate(); // Hook per la navigazione
 
+    // 2. Effetto per il caricamento dei dati del profilo
     useEffect(() => {
-        // Check authentication and redirect
+        // Verifica se l'utente è autenticato
         if (!isAuthenticated) {
-            navigate("/");
-            return;
+            navigate("/"); // Se non autenticato, reindirizza alla home
+            return; // Interrompi l'esecuzione dell'effetto
         }
 
+        // Funzione asincrona per recuperare i dati del profilo
         const fetchProfileData = async () => {
-            setIsLoading(true);
+            setIsLoading(true); // Imposta lo stato di caricamento a true
 
             try {
+                // Se è presente un token, effettua la richiesta al backend
                 if (token) {
                     const response = await fetch("http://localhost:3001/auth/profile", {
                         headers: { Authorization: `Bearer ${token}` },
                     });
 
+                    // Se la richiesta ha avuto successo, aggiorna lo stato con i dati del profilo
                     if (response.ok) {
                         const data = await response.json();
                         setProfileData(data);
-
                     } else {
                         setError("Errore nel recupero dei dati del profilo.");
                     }
                 }
             } catch (error) {
+                // Gestione degli errori durante la richiesta
                 setError("Errore durante la richiesta: " + error.message);
             } finally {
-                setIsLoading(false);
+                setIsLoading(false); // Imposta lo stato di caricamento a false, indipendentemente dal risultato
             }
         };
 
+        // Chiama la funzione per recuperare i dati
         fetchProfileData();
-    }, [isAuthenticated, token, navigate]);
+    }, [isAuthenticated, token, navigate]); // Eseguito solo quando cambia isAuthenticated o token
 
+    // 3. Funzione per gestire la cancellazione di un appuntamento
     const handleCancelAppointment = async (appointmentId) => {
         try {
             const response = await fetch(
@@ -59,6 +66,7 @@ function Profile() {
             );
 
             if (response.ok) {
+                // Aggiorna lo stato del profilo rimuovendo l'appuntamento cancellato
                 setProfileData((prevData) => ({
                     ...prevData,
                     appointments: prevData.appointments.filter(
@@ -74,9 +82,13 @@ function Profile() {
         }
     };
 
+    // 4. Rendering del componente
     return (
-        <div className="container mt-5">
+        <div className="container mt-5 w-100 d-flex justify-content-center">
+            {/* Se c'è un errore, mostra un alert */}
             {error && <Alert variant="danger">{error}</Alert>}
+
+            {/* Se sta caricando, mostra uno spinner */}
             {isLoading ? (
                 <div className="text-center">
                     <Spinner animation="border" role="status">
@@ -84,17 +96,18 @@ function Profile() {
                     </Spinner>
                 </div>
             ) : profileData ? (
-                <div>
-                    <h1>
-                        Profilo di {profileData.name} {profileData.surname}
-                    </h1>
-                    <p>Email: {profileData.email}</p>
-                    {/* Sezione appuntamenti */}
-                    <section className="mt-4">
-                        <h2>I miei appuntamenti</h2>
+                // Se ci sono dati del profilo, mostra la sezione appuntamenti
+                <div className="text-center w-100 h-100">
+                    <section className="mt-4 appointment-box">
+                        {/* Titolo della sezione */}
+                        <h2>
+                            Appuntamenti di {profileData.name} {profileData.surname}{" "}
+                        </h2>
+                        {/* Verifica se ci sono appuntamenti */}
                         {profileData && profileData.appointments && profileData.appointments.length === 0 ? (
                             <p>Non hai ancora prenotato nessun appuntamento.</p>
                         ) : (
+                            // Se ci sono appuntamenti, mostra una tabella
                             <Table striped bordered hover responsive>
                                 <thead>
                                     {/* Intestazione della tabella */}
@@ -107,7 +120,8 @@ function Profile() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {profileData?.appointments?.map(appointment => {
+                                    {/* Corpo della tabella - itera sugli appuntamenti e formatta la data */}
+                                    {profileData?.appointments?.map((appointment) => {
                                         let formattedDateTime = "Data e ora non disponibili";
                                         if (appointment.date) {
                                             formattedDateTime = format(parseISO(appointment.date), "PPPPp", {
@@ -120,7 +134,7 @@ function Profile() {
                                                 <td>{formattedDateTime}</td>
                                                 <td>{appointment.notes || "Nessuna nota"}</td>
                                                 <td>{appointment.status}</td>
-                                                <td>
+                                                <td>{/* Bottone per cancellare l'appuntamento */}
                                                     <Button
                                                         variant="danger"
                                                         onClick={() => handleCancelAppointment(appointment._id)}
@@ -134,16 +148,13 @@ function Profile() {
                                 </tbody>
                             </Table>
                         )}
-                        <Button
-                            variant="primary"
-                            className="mb-3"
-                            onClick={() => navigate("/")}
-                        >
+                        {/* Bottone per prenotare un nuovo appuntamento */}
+                        <Button variant="primary" className="mb-3" onClick={() => navigate("/")}>
                             Prenota un nuovo appuntamento
                         </Button>
                     </section>
                 </div>
-            ) : null}
+            ) : null} {/* Se non ci sono dati del profilo, non mostrare nulla */}
         </div>
     );
 }

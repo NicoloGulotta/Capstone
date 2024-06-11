@@ -36,7 +36,7 @@ function Servizi() {
   }, []);
 
   return (
-    <Container>
+    <Container className='my-5 content-wrapper '>
       {/* Sezione Hero */}
       <div className="hero" style={{ backgroundImage: `url(${immagineHero})` }}>
         <img src={immagineHero} alt="Barbiere al lavoro" className="img-fluid" /> {/* Aggiunto img-fluid */}
@@ -61,7 +61,7 @@ function Servizi() {
             <h2>I Nostri Servizi</h2>
             <Row>
               {servizi.map((servizio) => (
-                <Col key={servizio._id} xs={12} sm={6} md={3} lg={4} className="mb-4">
+                <Col key={servizio._id} xs={12} sm={6} md={4} lg={4} className="mb-4">
                   <Card className="mb-2 bg-dark" body style={{ padding: "0.5rem" }} onClick={() => navigate(`post/${servizio._id}`)}>
                     <Card.Img variant="top" src={servizio.cover} alt={servizio.title} style={{ maxHeight: "300px", objectFit: "cover" }} />
                     <Card.Body className='text-center '>
