@@ -7,7 +7,7 @@ function CustomAlert({ type, message, timeout = 5000 }) {
 
     useEffect(() => {
         let timer = setTimeout(() => setShow(false), timeout);
-        return () => clearTimeout(timer); // Pulisci il timer se il componente viene smontato
+        return () => clearTimeout(timer);
     }, [timeout]);
 
     return (

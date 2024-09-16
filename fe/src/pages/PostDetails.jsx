@@ -126,9 +126,7 @@ function PostDetails() {
                     style={{ maxHeight: "400px", objectFit: "cover" }}
                 />
                 <Card.Body>
-                    <Card.Title className="text-white"
-                        style={{ maxHeight: "3em", overflow: "hidden", textOverflow: "ellipsis" }}
-                    >
+                    <Card.Title className="text-white"                    >
                         {post.title}
                     </Card.Title>
                     <Card.Text className="text-white">{post.content}</Card.Text>
@@ -154,7 +152,7 @@ function PostDetails() {
                         size={24}
                         value={newCommentRating}
                         onChange={(newRating) => setNewCommentRating(newRating)}
-                        activeColor="#ffd700" // Classic gold for active stars
+                        activeColor="#ffd700"
                     />
                     <Button variant="dark" className="my-2" type="submit">
                         Invia
@@ -166,9 +164,9 @@ function PostDetails() {
                 <h3>Commenti</h3>
                 {(comments || []).length > 0 ? (
                     comments.map((comment) => {
-                        // Format the date correctly
-                        const formattedDate = format(parseISO(comment.createdAt), "PPPPp", { locale: it });
-
+                        const formattedDate = comment?.createdAt && typeof comment.createdAt === 'string'
+                            ? format(parseISO(comment.createdAt), "PPPPp", { locale: it })
+                            : "Caricamento in corso...";
                         return (
                             <div key={comment._id} className="comment-container mb-3">
                                 {comment.author && (

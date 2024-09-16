@@ -58,7 +58,7 @@ function Servizi() {
           <Alert variant="danger">Si è verificato un errore: {error}</Alert>
         ) : (
           <>
-            <h2>I Nostri Servizi</h2>
+            <h2 className="text-center my-4">I Nostri Servizi</h2>
             <Row>
               {servizi.map((servizio) => (
                 <Col key={servizio._id} xs={12} sm={6} md={4} lg={4} className="mb-4">

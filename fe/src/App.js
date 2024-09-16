@@ -28,7 +28,7 @@ function App() {
   const logout = (e) => {
     e.preventDefault();
     localStorage.clear();
-    window.location.reload("/"); // Ricarica la pagina dopo il logout
+    window.location.reload("/");
   };
 
   return (
@@ -51,10 +51,10 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/settings" element={<Settings />} />
               <Route path="/register" element={<RegistrationForm />} />
               <Route path="/post/:postId" element={<PostDetails />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/settings" element={<Settings />} />
             </Routes>
           )}
         </Container>
