@@ -37,10 +37,7 @@ app.use(helmet());
 app.use(express.json());
 
 // Configurazione CORS (Cross-Origin Resource Sharing)
-app.use(cors({
-    origin: 'http://localhost:3000',
-    optionsSuccessStatus: 200
-}));
+app.use(cors());
 // Gestione delle sessioni (opzionale)
 app.use(
     session({

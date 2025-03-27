@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }) => {
 
         if (storedToken && storedUser) {
             setIsAuthenticated(true);
-            setUser(storedUser);
+            setUser(JSON.parse(storedUser));
             setToken(storedToken);
         } else {
             // Rimuoviamo token e user se non validi
