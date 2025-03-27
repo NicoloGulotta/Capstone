@@ -1,0 +1,26 @@
+[
+  {
+    "id": "1",
+    "title": "Taglio Classico",
+    "cover": "https://i.imgur.com/2k9h0eH.jpg",
+    "content": "Un taglio tradizionale per un look elegante e senza tempo."
+  },
+  {
+    "id": "2",
+    "title": "Rasatura Barba",
+    "cover": "https://i.imgur.com/3Ym8j8X.jpg",
+    "content": "Una rasatura professionale per una barba perfetta e curata."
+  },
+  {
+    "id": "3",
+    "title": "Taglio Moderno",
+    "cover": "https://i.imgur.com/1mN689p.jpg",
+    "content": "Un taglio alla moda per un look fresco e contemporaneo."
+  },
+  {
+    "id": "4",
+    "title": "Trattamento Capelli",
+    "cover": "https://i.imgur.com/4q8R5rZ.jpg",
+    "content": "Cura e trattamento per capelli sani e lucenti."
+  }
+]

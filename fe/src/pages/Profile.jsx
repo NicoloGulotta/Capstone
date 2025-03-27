@@ -130,7 +130,7 @@ function Profile() {
                                         }
                                         return (
                                             <tr key={appointment._id}>
-                                                <td>{appointment.serviceType.title}</td>
+                                                <td>{appointment.title}</td>
                                                 <td>{formattedDateTime}</td>
                                                 <td>{appointment.notes || "Nessuna nota"}</td>
                                                 <td>{appointment.status}</td>
